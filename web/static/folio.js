@@ -116,7 +116,8 @@ canvasEl.addEventListener('keydown', async (e) => {
                 sel.addRange(range);
             } catch (err) {
                 node.textContent = '';
-                alert('Gagal mengambil gambar/link.');
+                errorMsg.textContent = 'Failed to fetch embed/image.';
+                setTimeout(() => { if (errorMsg.textContent === 'Failed to fetch embed/image.') errorMsg.textContent = ''; }, 3000);
             }
             embedMode = null;
             node.classList.remove('embed-placeholder');
