@@ -1,6 +1,6 @@
 # Folio
 
-Folio is a lightning-fast, ultra-minimalist, and zero-dependency self-hosted publishing platform inspired by Telegra.ph. It is designed to be deployed as a single Go binary, offering a distraction-free editorial experience with enterprise-grade security features.
+Folio is a lightning-fast, ultra-minimalist, and zero-dependency self-hosted publishing platform inspired by Telegra.ph. It is designed to be deployed as a single Go binary, offering a distraction-free editorial experience with enterprise-grade security features and a mathematically strict UI design.
 
 ## Why Folio?
 
@@ -13,17 +13,27 @@ It requires no user accounts, no databases to configure, and no external depende
 
 ## Key Features
 
+### Design & UX Philosophy
+- **Strict 8-Point Modular Spacing System**: The entire UI is built on a mathematically precise 8-point CSS grid (`--space-1` to `--space-9`), guaranteeing perfect typography and spacing consistency across all viewports.
+- **AMOLED-Optimized Dark Mode**: Features a "True Black" (`#000000`) dark mode to save power on OLED screens, automatically adjusting based on the user's `prefers-color-scheme`.
+- **Zero Native Popups**: Absolutely no lazy `alert()`, `confirm()`, or `prompt()` calls. Destructive actions (like deleting an article) use smooth, custom-built centered modal overlays.
+- **Floating Action Bar (FAB)**: Editing and managing published articles is handled seamlessly via an elegant floating action container at the bottom right.
 - **Distraction-Free Canvas**: A pure HTML5 `contenteditable` editor without any heavy third-party WYSIWYG libraries.
+
+### Engineering & Architecture
 - **Zero Registration**: Anonymous publishing out of the box. Edit rights are securely managed via a 10-year `HttpOnly` browser cookie and a cryptographic backup token.
 - **Single Binary Architecture**: Written entirely in Go. The database is a pure-Go SQLite implementation (`modernc.org/sqlite`) running in WAL mode, and all static assets (HTML/CSS/JS) are embedded (`//go:embed`). No external web server is needed.
 - **Universal Link Previews (Open Graph)**: Automatically resizes and compresses the first uploaded image to guarantee perfect link previews (< 300KB) across WhatsApp, X/Twitter, Telegram, LinkedIn, and Discord.
 - **Markdown Auto-Format**: Type `# ` to create an H1, `## ` for H2, and `> ` for a blockquote. Format text effortlessly without leaving your keyboard.
 - **Local Auto-Save**: Drafts are automatically persisted to the browser's `localStorage` to prevent accidental data loss.
+
+### Safety & Compliance
 - **Anti-Spam & Security**:
   - In-memory IP rate limiting (Max 5 articles & 15 image uploads per hour).
   - Strict XSS sanitization (via `bluemonday`) to eliminate malicious script injections.
   - Network payload capping to prevent Denial of Service (OOM) attacks.
 - **Storage Garbage Collection**: A silent background worker automatically cleans up orphaned draft images every 24 hours, keeping server disks pristine.
+- **Built-in Legal Pages**: Comes pre-configured with minimalist Privacy Policy and Terms of Service templates linked seamlessly in the footer.
 
 ## Running Locally
 
@@ -35,7 +45,7 @@ Folio is designed to be effortlessly compiled and run.
 ### Build & Run
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/folio.git
+git clone https://github.com/adsurkasur/folio.git
 cd folio
 
 # 2. Download dependencies
