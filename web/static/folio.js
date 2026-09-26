@@ -266,6 +266,53 @@ if (canvasEl && linkTooltip) {
 document.addEventListener('selectionchange', () => {
     updateToolbarPosition();
     updateFormatBubble();
+    
+    // Remove figure focus if selection moved outside
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount) {
+        const node = sel.anchorNode;
+        if (node && !node.closest('figure')) {
+            document.querySelectorAll('figure.focus').forEach(fig => fig.classList.remove('focus'));
+        }
+    }
+});
+
+// Manage figure focus state
+document.addEventListener('click', (e) => {
+    if (!isArticleEditing && window.location.pathname !== '/') return;
+    const clickedFigure = e.target.closest('figure');
+    
+    // Remove focus from all figures
+    document.querySelectorAll('figure.focus').forEach(fig => {
+        if (fig !== clickedFigure) fig.classList.remove('focus');
+    });
+
+    // If clicked on an image inside a figure, focus the figure
+    if (clickedFigure && e.target.tagName === 'IMG') {
+        clickedFigure.classList.add('focus');
+        // Clear native selection so it doesn't look weird
+        window.getSelection().removeAllRanges();
+    }
+});
+
+document.addEventListener('keydown', (e) => {
+    if (!isArticleEditing && window.location.pathname !== '/') return;
+    if (e.key === 'Backspace' || e.key === 'Delete') {
+        const focusedFigure = document.querySelector('figure.focus');
+        if (focusedFigure) {
+            e.preventDefault();
+            let prev = focusedFigure.previousElementSibling;
+            if (!prev) {
+                prev = document.createElement('p');
+                prev.innerHTML = '<br>';
+                focusedFigure.parentNode.insertBefore(prev, focusedFigure);
+            }
+            focusedFigure.parentNode.removeChild(focusedFigure);
+            const target = prev.lastChild || prev;
+            setCaret(target, target.textContent ? target.textContent.length : 0);
+            updatePlaceholder();
+        }
+    }
 });
 
 // Image / Figure insertion helper
