@@ -209,11 +209,11 @@ publishBtn.addEventListener('click', async () => {
 
     const res = await fetch(url, {
         method: method,
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: new URLSearchParams({
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
             title: titleEl.value,
-            author: authorEl.value,
-            contentHTML: html
+            author_name: authorEl.value,
+            content_html: html
         })
     });
     
