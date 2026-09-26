@@ -1,10 +1,22 @@
-﻿:root {
+:root {
     --bg-color: #ffffff;
     --text-color: #1a1a1a;
     --text-muted: #b3b3b3;
     --accent: #000000;
     --border: #e0e0e0;
     --shadow: rgba(0,0,0,0.15);
+    
+    /* Strict 8pt Modular Spacing System */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 16px;
+    --space-4: 24px;
+    --space-5: 32px;
+    --space-6: 40px;
+    --space-7: 48px;
+    --space-8: 64px;
+    --space-9: 80px;
+    
     --ui-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --content-font: "Lora", "Merriweather", "Georgia", serif;
 }
@@ -24,9 +36,7 @@ body {
     line-height: 1.8;
     background-color: var(--bg-color);
     font-family: var(--content-font);
-    
     color: var(--text-color);
-    
     margin: 0;
     padding: 0;
     transition: background-color 0.4s ease, color 0.4s ease;
@@ -35,7 +45,7 @@ body {
 .folio-container {
     max-width: 700px;
     margin: 0 auto;
-    padding: 60px 20px 100px;
+    padding: var(--space-8) var(--space-4) var(--space-9); /* 64px 24px 80px */
     position: relative;
 }
 
@@ -49,25 +59,18 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 24px;
+    margin-bottom: var(--space-4); /* 24px */
 }
 .folio-inputs {
     flex-grow: 1;
-    padding-right: 20px;
-}
-.folio-actions {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    position: relative;
 }
 
+/* Standard Buttons */
 .folio-btn {
     background-color: var(--bg-color);
-    
     color: var(--accent);
     border: 1px solid var(--accent);
-    padding: 8px 20px;
+    padding: var(--space-2) var(--space-4); /* 8px 24px */
     border-radius: 50px;
     font-size: 14px;
     cursor: pointer;
@@ -75,33 +78,26 @@ body {
     font-weight: 500;
     letter-spacing: 0.5px;
     outline: none;
+    text-decoration: none;
 }
 
 .folio-btn:hover, .folio-btn:active {
     background-color: var(--accent);
     color: var(--bg-color);
     transform: translateY(-2px);
-
 }
 
 .folio-btn:active {
     transform: translateY(0);
 }
 
-.folio-input-group {
-    position: relative;
-    margin-bottom: 5px;
-}
-
 /* Inputs & Compact Sizes */
 .folio-title, .folio-author {
     margin-top: 0;
-    margin-bottom: 12px;
     color: var(--text-color);
     width: 100%;
     border: none;
     background: transparent;
-    color: var(--text-color);
     outline: none;
     transition: color 0.3s ease;
 }
@@ -110,14 +106,15 @@ body {
     font-size: 32px;
     font-weight: bold;
     font-family: var(--content-font);
-    padding: 5px 0;
+    padding: 0;
+    margin-bottom: var(--space-2); /* 8px */
 }
 
 .folio-author {
-    margin-bottom: 24px;
     font-size: 16px;
     color: var(--accent);
-    padding: 5px 0;
+    padding: 0;
+    margin-bottom: var(--space-6) !important; /* 40px */
 }
 
 /* Native Error Styles */
@@ -131,7 +128,7 @@ body {
     position: absolute;
     top: 100%;
     right: 0;
-    margin-top: 5px;
+    margin-top: var(--space-1);
     white-space: nowrap;
     opacity: 0;
     transform: translateY(-10px);
@@ -157,7 +154,6 @@ body {
     transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
     pointer-events: none;
 }
-
 .folio-title:not(:placeholder-shown) ~ .folio-label.title-label,
 .folio-author:not(:placeholder-shown) ~ .folio-label.author-label {
     opacity: 1;
@@ -169,44 +165,46 @@ body {
     font-size: 18px;
     min-height: 400px;
     outline: none;
-    margin-top: 10px;
-    
     transition: all 0.3s ease;
     position: relative;
 }
 
-.folio-canvas p {
-    margin-top: 0;
-    margin-bottom: 24px;
-    
-    transition: all 0.2s ease;
-}
-.folio-canvas h1, .folio-canvas h2, .folio-canvas h3, .folio-canvas blockquote {
+/* Typography Scale & Spacing */
+.folio-canvas h1, .folio-canvas h2, .folio-canvas h3, .folio-canvas blockquote, .folio-canvas p, .folio-canvas ul, .folio-canvas ol {
     outline: none;
 }
+
+.folio-canvas p {
+    margin-top: 0;
+    margin-bottom: var(--space-4); /* 24px */
+    transition: all 0.2s ease;
+}
+
 .folio-canvas h1 {
-    margin-top: 48px;
-    margin-bottom: 24px;
     font-size: 28px;
-    
     line-height: 1.3;
+    margin-top: var(--space-7); /* 48px */
+    margin-bottom: var(--space-4); /* 24px */
 }
+
 .folio-canvas h2 {
-    margin-top: 40px;
-    margin-bottom: 16px;
     font-size: 22px;
-    
     line-height: 1.3;
+    margin-top: var(--space-6); /* 40px */
+    margin-bottom: var(--space-3); /* 16px */
 }
+
 .folio-canvas h3 {
     font-size: 19px;
-    margin: 18px 0 6px 0;
     line-height: 1.3;
+    margin-top: var(--space-5); /* 32px */
+    margin-bottom: var(--space-2); /* 8px */
 }
+
 .folio-canvas blockquote {
     border-left: 3px solid var(--accent);
-    padding-left: 15px;
-    margin: 24px 0;
+    padding-left: var(--space-3); /* 16px */
+    margin: var(--space-4) 0; /* 24px 0 */
     color: var(--text-muted);
     font-style: italic;
 }
@@ -214,20 +212,18 @@ body {
 .folio-canvas hr {
     border: none;
     border-top: 1px solid var(--border);
-    margin: 24px 0;
+    margin: var(--space-6) 0; /* 40px 0 */
 }
 
 .folio-canvas pre {
     background: rgba(128, 128, 128, 0.1);
-    
     border-radius: 8px;
-    padding: 14px 18px;
+    padding: var(--space-3) var(--space-4); /* 16px 24px */
     font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
     font-size: 15px;
-    line-height: 1.8;
+    line-height: 1.6;
     overflow-x: auto;
-    margin: 24px 0;
-    white-space: pre;
+    margin: var(--space-4) 0; /* 24px 0 */
 }
 
 .folio-canvas code {
@@ -248,18 +244,18 @@ body {
 
 .folio-canvas ul, .folio-canvas ol {
     margin-top: 0;
-    padding-left: 28px;
-    margin: 24px 0;
+    margin-bottom: var(--space-4); /* 24px */
+    padding-left: var(--space-5); /* 32px */
 }
 .folio-canvas li {
-    margin-bottom: 16px;
+    margin-bottom: var(--space-2); /* 8px */
 }
 
 .folio-canvas img {
     max-width: 100%;
     border-radius: 8px;
     display: block;
-    margin: 20px auto;
+    margin: var(--space-5) auto; /* 32px auto */
     transition: opacity 0.3s ease;
 }
 
@@ -272,7 +268,7 @@ body {
     position: absolute;
     left: -90px;
     display: flex;
-    gap: 10px;
+    gap: var(--space-2); /* 8px */
     opacity: 0;
     transform: translateX(10px) scale(0.9);
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -281,13 +277,11 @@ body {
     background: var(--bg-color);
     z-index: 10;
 }
-
 .folio-toolbar.active {
     opacity: 1;
     transform: translateX(0) scale(1);
     pointer-events: auto;
 }
-
 .folio-toolbar-btn {
     background: var(--bg-color);
     border: 2px solid var(--border);
@@ -302,91 +296,21 @@ body {
     transition: all 0.2s ease;
     outline: none;
 }
-
 .folio-toolbar-btn:hover, .folio-toolbar-btn:active {
     border-color: var(--text-color);
     color: var(--text-color);
     transform: scale(1.1);
 }
 
-/* Mobile Adjustments */
-@media (max-width: 800px) {
-    .folio-label {
-        display: none !important;
-    }
-    .folio-toolbar {
-        left: auto;
-        right: 20px;
-    }
-    }
-    .folio-canvas {
-        padding-right: 60px;
-}
-@media (max-width: 600px) {
-    .folio-container {
-        padding: 40px 20px 90px;
-    }
-    .folio-top-row {
-        flex-direction: column;
-        margin-bottom: 24px;
-    }
-    .folio-inputs {
-        padding-right: 0;
-    color: var(--text-color);
-    }
-    .folio-actions {
-        position: fixed;
-        bottom: 30px;
-        right: 20px;
-        z-index: 1000;
-        align-items: flex-end;
-        animation: fabEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-    /* Match desktop pill identically, just add shadow */
-    .folio-actions .folio-btn {
-    
-
-    }
-    .folio-actions .folio-btn:active {
-        transform: scale(0.95);
-    }
-    .folio-error {
-        position: absolute;
-        bottom: calc(100% + 10px);
-        top: auto;
-        right: 0;
-        left: auto;
-        
-        
-        
-        
-        font-size: 12px;
-
-        white-space: nowrap;
-    }
-}
-
-@keyframes fabEnter {
-    0% {
-        opacity: 0;
-        transform: translateY(16px) scale(0.92);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-/* Author Floating Bar */
+/* Author Floating Bar (Action Buttons) */
 .author-floating-bar {
     position: fixed;
-    bottom: 30px;
-    right: 20px;
+    bottom: var(--space-5); /* 32px */
+    right: var(--space-4); /* 24px */
     display: flex;
-    gap: 12px;
+    gap: var(--space-3); /* 16px */
     z-index: 1000;
 }
-
 .folio-btn-danger {
     color: #ff4d4d !important;
     border-color: #ff4d4d !important;
@@ -415,7 +339,7 @@ body {
 }
 .folio-modal {
     background: var(--bg-color);
-    padding: 25px 40px;
+    padding: var(--space-5) var(--space-6); /* 32px 40px */
     border-radius: 12px;
     text-align: center;
     border: 1px solid var(--border);
@@ -430,8 +354,8 @@ body {
 /* Footer Styles */
 .folio-footer {
     text-align: center;
-    margin-top: 80px;
-    padding-bottom: 40px;
+    margin-top: var(--space-9); /* 80px */
+    padding-bottom: var(--space-6); /* 40px */
     font-size: 13px;
     color: var(--text-muted);
     font-family: var(--ui-font);
@@ -445,6 +369,21 @@ body {
     color: var(--text-color);
 }
 
-.folio-author {
-    margin-bottom: 40px !important;
+/* Mobile Adjustments */
+@media (max-width: 800px) {
+    .folio-label {
+        display: none !important;
+    }
+    .folio-toolbar {
+        left: auto;
+        right: 20px;
+    }
+    .folio-canvas {
+        padding-right: 60px;
+    }
+}
+@media (max-width: 600px) {
+    .folio-container {
+        padding: var(--space-6) var(--space-4) var(--space-9); /* 40px 24px 80px */
+    }
 }
