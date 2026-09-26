@@ -1,11 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Folio</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 fill=%27black%27/%3E%3Ctext x=%2750%27 y=%2772%27 font-family=%27serif%27 font-style=%27italic%27 font-size=%2780%27 fill=%27white%27 text-anchor=%27middle%27%3E%C6%92%3C/text%3E%3C/svg%3E">
-    <link rel="stylesheet" href="/static/folio.css?v=30">
+    <link rel="stylesheet" href="/static/folio.css?v=31">
 </head>
 <body>
     <div class="folio-container">
@@ -39,6 +39,25 @@
         </main>
     </div>
     <div class="folio-footer"><a href="https://www.arinahub.com/" target="_blank">arinahub</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="/terms">Terms</a></div>
-    <script src="/static/folio.js?v=30"></script>
+
+    <div id="formatBubble" class="folio-format-bubble">
+        <div class="folio-bubble-buttons">
+            <button class="folio-bubble-btn" data-action="bold" title="Bold"><b style="font-family:serif;font-size:16px;">B</b></button>
+            <button class="folio-bubble-btn" data-action="italic" title="Italic"><i style="font-family:serif;font-size:16px;">i</i></button>
+            <button class="folio-bubble-btn" data-action="link" title="Link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+            </button>
+            <button class="folio-bubble-btn" data-action="h1" title="Heading 1" style="font-family:serif;font-size:19px;font-weight:600;">T</button>
+            <button class="folio-bubble-btn" data-action="h2" title="Heading 2" style="font-family:serif;font-size:14px;font-weight:600;">T</button>
+            <button class="folio-bubble-btn" data-action="quote" title="Quote" style="font-family:serif;font-size:20px;line-height:1;">“</button>
+        </div>
+        <div class="folio-bubble-link-box" style="display:none;">
+            <input type="text" class="folio-bubble-input" placeholder="Paste or type a link..." spellcheck="false">
+            <button class="folio-bubble-btn folio-bubble-close" title="Cancel">✕</button>
+        </div>
+    </div>
+    <div id="linkTooltip" class="folio-link-tooltip"></div>
+
+    <script src="/static/folio.js?v=31"></script>
 </body>
 </html>

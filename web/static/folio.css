@@ -287,13 +287,50 @@ body {
     margin-bottom: var(--space-2); /* 8px */
 }
 
-.folio-canvas img {
+.folio-canvas figure {
+    margin: var(--space-5) 0;
+    text-align: center;
+}
+.folio-canvas figure img, .folio-canvas img {
     max-width: 100%;
     border-radius: 8px;
     display: block;
-    margin: var(--space-5) auto; /* 32px auto */
+    margin: 0 auto;
     transition: opacity 0.3s ease;
 }
+.folio-canvas figcaption {
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-muted);
+    font-family: var(--ui-font);
+    margin-top: var(--space-2);
+    outline: none;
+    min-height: 20px;
+}
+.folio-canvas[contenteditable="true"] figcaption:empty::before,
+.folio-canvas figcaption[contenteditable="true"]:empty::before {
+    content: attr(data-placeholder);
+    color: var(--text-muted);
+    cursor: text;
+    pointer-events: none;
+}
+
+.folio-author-name[contenteditable="true"]:empty::before {
+    content: attr(data-placeholder);
+    color: var(--text-muted);
+    cursor: text;
+    pointer-events: none;
+}
+.folio-title[contenteditable="true"]:empty::before {
+    content: "Title";
+    color: var(--text-muted);
+    cursor: text;
+    pointer-events: none;
+}
+.folio-author-name[contenteditable="true"], .folio-title[contenteditable="true"] {
+    outline: none;
+}
+
 
 /* Embed Placeholder */
 .embed-placeholder::before { content: attr(data-placeholder); color: var(--text-muted); font-style: italic; font-family: var(--ui-font); pointer-events: none; position: absolute; left: 0; transition: opacity 0.2s; }
@@ -417,4 +454,101 @@ body {
         min-width: 76px;
         height: 28px;
     }
+}
+
+/* Floating Selection Format Bubble */
+.folio-format-bubble {
+    position: absolute;
+    z-index: 1500;
+    background: #242424;
+    border-radius: 8px;
+    padding: 3px 6px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    opacity: 0;
+    transform: translate(-50%, 6px) scale(0.96);
+    pointer-events: none;
+    transition: opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1), transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.folio-format-bubble.active {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+    pointer-events: auto;
+}
+.folio-bubble-buttons {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+.folio-bubble-btn {
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease, transform 0.15s ease;
+    padding: 0;
+    outline: none;
+}
+.folio-bubble-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+.folio-bubble-btn:active {
+    transform: scale(0.92);
+}
+.folio-bubble-link-box {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0 2px;
+}
+.folio-bubble-input {
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    font-family: var(--ui-font);
+    font-size: 13px;
+    outline: none;
+    padding: 4px 6px;
+    width: 200px;
+}
+.folio-bubble-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Link URL Tooltip Preview */
+.folio-link-tooltip {
+    position: absolute;
+    z-index: 1500;
+    background: #242424;
+    color: #ffffff;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-family: var(--ui-font);
+    max-width: 480px;
+    word-break: break-all;
+    text-align: center;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    opacity: 0;
+    transform: translate(-50%, 6px) scale(0.96);
+    pointer-events: none;
+    transition: opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1), transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.folio-link-tooltip.active {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+    pointer-events: auto;
+}
+.folio-link-tooltip a {
+    color: #ffffff;
+    text-decoration: underline;
 }

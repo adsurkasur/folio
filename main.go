@@ -213,28 +213,7 @@ func handleArticle(w http.ResponseWriter, r *http.Request) {
 
 func handleEditPage(w http.ResponseWriter, r *http.Request) {
 	slug := r.PathValue("slug")
-	var a Article
-	var contentHTML string
-	err := db.QueryRow("SELECT slug, title, author_name, content_html, author_token_hash FROM articles WHERE slug = ?", slug).
-		Scan(&a.Slug, &a.Title, &a.AuthorName, &contentHTML, &a.AuthorTokenHash)
-	if err != nil {
-		http.NotFound(w, r)
-		return
-	}
-	a.ContentHTML = template.HTML(contentHTML)
-
-	cookie, _ := r.Cookie("folio_author_token")
-	if cookie == nil || hashToken(cookie.Value) != a.AuthorTokenHash {
-		http.Error(w, "Forbidden", http.StatusForbidden)
-		return
-	}
-
-	data := struct {
-		IsEdit  bool
-		Article Article
-	}{true, a}
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	tmpl.ExecuteTemplate(w, "editor.html", data)
+	http.Redirect(w, r, "/"+slug+"?edit=1", http.StatusFound)
 }
 
 func handlePublish(w http.ResponseWriter, r *http.Request) {
@@ -526,6 +505,7 @@ func main() {
 	policy = bluemonday.UGCPolicy()
 	policy.AllowElements("iframe", "figure", "figcaption")
 	policy.AllowAttrs("src", "width", "height", "frameborder", "allowfullscreen").OnElements("iframe")
+	policy.AllowAttrs("data-placeholder", "contenteditable").OnElements("figcaption")
 
 	tmpl = template.Must(template.ParseFS(webFS, "web/templates/*.html"))
 
