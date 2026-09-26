@@ -15,6 +15,7 @@ let currentActiveNode = null;
 let embedMode = null;
 let isArticleEditing = false;
 let savedBubbleRange = null;
+let isMouseSelecting = false;
 
 function setCaret(node, offset = 0) {
     const range = document.createRange();
@@ -286,9 +287,26 @@ if (canvasEl && linkTooltip) {
     });
 }
 
+document.addEventListener('mousedown', (e) => {
+    if (formatBubble && formatBubble.contains(e.target)) return;
+    isMouseSelecting = true;
+    hideFormatBubble();
+});
+
+document.addEventListener('mouseup', () => {
+    isMouseSelecting = false;
+    updateFormatBubble();
+});
+
 document.addEventListener('selectionchange', () => {
     updateToolbarPosition();
-    updateFormatBubble();
+    
+    if (isMouseSelecting) {
+        hideFormatBubble();
+    } else {
+        // debounce keyboard selection slightly
+        setTimeout(updateFormatBubble, 50);
+    }
     
     // Remove figure focus if selection moved outside
     const sel = window.getSelection();

@@ -540,7 +540,7 @@ body {
     word-break: break-all;
     text-align: center;
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: none;
     opacity: 0;
     transform: translate(-50%, 6px) scale(0.96);
     pointer-events: none;
@@ -554,4 +554,12 @@ body {
 .folio-link-tooltip a {
     color: #ffffff;
     text-decoration: underline;
+}
+
+/* Base Canvas Links */
+.folio-canvas a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
 }
