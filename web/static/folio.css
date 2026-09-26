@@ -1,4 +1,4 @@
-:root {
+﻿:root {
     --bg-color: #ffffff;
     --text-color: #1a1a1a;
     --text-muted: #b3b3b3;
@@ -22,7 +22,7 @@
 
 body {
     font-family: var(--content-font);
-    background-color: var(--bg-color);
+    
     color: var(--text-color);
     line-height: 1.6;
     margin: 0;
@@ -61,7 +61,7 @@ body {
 }
 
 .folio-btn {
-    background-color: var(--bg-color);
+    
     color: var(--accent);
     border: 1px solid var(--accent);
     padding: 8px 20px;
@@ -78,7 +78,7 @@ body {
     background-color: var(--accent);
     color: var(--bg-color);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px var(--shadow);
+
 }
 
 .folio-btn:active {
@@ -206,7 +206,7 @@ body {
 
 .folio-canvas pre {
     background: rgba(128, 128, 128, 0.1);
-    border: 1px solid var(--border);
+    
     border-radius: 8px;
     padding: 14px 18px;
     font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
@@ -327,7 +327,7 @@ body {
     }
     /* Match desktop pill identically, just add shadow */
     .folio-actions .folio-btn {
-        box-shadow: 0 4px 18px var(--shadow);
+
     }
     .folio-actions .folio-btn:active {
         transform: scale(0.95);
@@ -338,12 +338,12 @@ body {
         top: auto;
         right: 0;
         left: auto;
-        background-color: var(--bg-color);
-        border: 1px solid var(--border);
-        padding: 6px 14px;
-        border-radius: 20px;
+        
+        
+        
+        
         font-size: 12px;
-        box-shadow: 0 4px 14px var(--shadow);
+
         white-space: nowrap;
     }
 }

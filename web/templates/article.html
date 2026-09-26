@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -14,7 +14,7 @@
     <meta name="twitter:image" content="{{.Article.OGImageURL}}">
     {{end}}
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 fill=%27black%27/%3E%3Ctext x=%2750%27 y=%2775%27 font-family=%27serif%27 font-style=%27italic%27 font-size=%2780%27 fill=%27white%27 text-anchor=%27middle%27%3E%C6%92%3C/text%3E%3C/svg%3E">
-    <link rel="stylesheet" href="/static/folio.css?v=10">
+    <link rel="stylesheet" href="/static/folio.css?v=11">
 </head>
 <body>
     <div class="folio-container">
@@ -30,7 +30,7 @@
                 <div class="folio-actions" style="position: relative;">
                     <a href="/edit/{{.Article.Slug}}" class="folio-btn" style="text-decoration: none; margin-bottom: 10px; display: inline-block; text-align: center;">EDIT</a>
                     <button id="btnDelete" onclick="showConfirm()" class="folio-btn" style="color: #ff4d4d; border-color: #ff4d4d;">DELETE</button>
-                    <div id="confirmDelete" style="display:none; flex-direction:column; gap:10px; margin-top:5px; background:var(--bg-color); border:1px solid var(--border); padding:10px; border-radius:10px; box-shadow:0 4px 12px var(--shadow); position:absolute; top:100%; right:0; z-index:100; min-width:160px;">
+
                         <span style="font-size:14px; font-family:var(--ui-font); color:var(--text-color); text-align:center;">Delete forever?</span>
                         <div style="display:flex; gap:10px; justify-content:center;">
                             <button onclick="hideConfirm()" class="folio-btn" style="padding:4px 12px; font-size:12px;">Cancel</button>
