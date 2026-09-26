@@ -10,6 +10,15 @@ const btnEmbed = document.getElementById('btnEmbed');
 let currentActiveNode = null;
 let embedMode = null;
 
+function setCaret(node, offset = 0) {
+    const range = document.createRange();
+    range.setStart(node, offset);
+    range.collapse(true);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+}
+
 function updatePlaceholder() {
     if (canvasEl.textContent.trim() === '' && canvasEl.children.length <= 1 && !embedMode) {
         canvasEl.classList.add('empty');
@@ -136,11 +145,7 @@ canvasEl.addEventListener('keydown', async (e) => {
                     p.innerHTML = '<br>';
                     block.parentNode.replaceChild(p, block);
 
-                    const range = document.createRange();
-                    range.setStart(p, 0);
-                    range.collapse(true);
-                    sel.removeAllRanges();
-                    sel.addRange(range);
+                    setCaret(p, 0);
                     return;
                 }
                 
@@ -155,11 +160,7 @@ canvasEl.addEventListener('keydown', async (e) => {
                         } else {
                             canvasEl.appendChild(p);
                         }
-                        const range = document.createRange();
-                        range.setStart(p, 0);
-                        range.collapse(true);
-                        sel.removeAllRanges();
-                        sel.addRange(range);
+                        setCaret(p, 0);
                         return;
                     }
                 }
@@ -178,15 +179,7 @@ canvasEl.addEventListener('keydown', async (e) => {
                 p.innerHTML = text ? text : '<br>';
                 block.parentNode.replaceChild(p, block);
 
-                const range = document.createRange();
-                if (text && p.firstChild) {
-                    range.setStart(p.firstChild, 0);
-                } else {
-                    range.setStart(p, 0);
-                }
-                range.collapse(true);
-                sel.removeAllRanges();
-                sel.addRange(range);
+                setCaret(text && p.firstChild ? p.firstChild : p, 0);
                 return;
             }
         }
@@ -202,17 +195,8 @@ function transformBlock(node, tag, text) {
     }
     node.parentNode.replaceChild(el, node);
     el.focus();
-    const range = document.createRange();
-    const sel = window.getSelection();
-    if (el.firstChild && el.firstChild.nodeType === 3) {
-        range.setStart(el.firstChild, el.firstChild.length);
-        range.collapse(true);
-    } else {
-        range.setStart(el, 0);
-        range.collapse(true);
-    }
-    sel.removeAllRanges();
-    sel.addRange(range);
+    const target = el.firstChild && el.firstChild.nodeType === 3 ? el.firstChild : el;
+    setCaret(target, target.nodeType === 3 ? target.length : 0);
 }
 
 // Markdown input formatting
@@ -258,11 +242,7 @@ canvasEl.addEventListener('input', (e) => {
 
             p.replaceChild(frag, node);
 
-            const range = document.createRange();
-            range.setStart(afterNode, afterNode.length);
-            range.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(range);
+            setCaret(afterNode, afterNode.length);
             return;
         }
 
@@ -289,11 +269,7 @@ canvasEl.addEventListener('input', (e) => {
 
             p.replaceChild(frag, node);
 
-            const range = document.createRange();
-            range.setStart(afterNode, afterNode.length);
-            range.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(range);
+            setCaret(afterNode, afterNode.length);
             return;
         }
     }
@@ -309,11 +285,7 @@ canvasEl.addEventListener('input', (e) => {
             code.innerHTML = '<br>';
             pre.appendChild(code);
             parentBlock.parentNode.replaceChild(pre, parentBlock);
-            const range = document.createRange();
-            range.setStart(code, 0);
-            range.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(range);
+            setCaret(code, 0);
             return;
         }
 
@@ -325,15 +297,8 @@ canvasEl.addEventListener('input', (e) => {
             li.innerHTML = rem.trim() ? rem : '<br>';
             ul.appendChild(li);
             parentBlock.parentNode.replaceChild(ul, parentBlock);
-            const range = document.createRange();
-            if (rem.trim() && li.firstChild) {
-                range.setStart(li.firstChild, rem.length);
-            } else {
-                range.setStart(li, 0);
-            }
-            range.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(range);
+            const target = rem.trim() && li.firstChild ? li.firstChild : li;
+            setCaret(target, rem.trim() && li.firstChild ? rem.length : 0);
             return;
         }
 
@@ -345,15 +310,8 @@ canvasEl.addEventListener('input', (e) => {
             li.innerHTML = rem.trim() ? rem : '<br>';
             ol.appendChild(li);
             parentBlock.parentNode.replaceChild(ol, parentBlock);
-            const range = document.createRange();
-            if (rem.trim() && li.firstChild) {
-                range.setStart(li.firstChild, rem.length);
-            } else {
-                range.setStart(li, 0);
-            }
-            range.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(range);
+            const target = rem.trim() && li.firstChild ? li.firstChild : li;
+            setCaret(target, rem.trim() && li.firstChild ? rem.length : 0);
             return;
         }
 
@@ -364,11 +322,7 @@ canvasEl.addEventListener('input', (e) => {
             p.innerHTML = '<br>';
             parentBlock.parentNode.replaceChild(hr, parentBlock);
             hr.parentNode.insertBefore(p, hr.nextSibling);
-            const range = document.createRange();
-            range.setStart(p, 0);
-            range.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(range);
+            setCaret(p, 0);
             return;
         }
 
@@ -393,12 +347,13 @@ function saveDraft() {
     }
 }
 
-titleEl.addEventListener('input', () => {
-    titleEl.classList.remove('error');
-    errorMsg.textContent = '';
+document.querySelector('.folio-inputs').addEventListener('input', (e) => {
+    if (e.target === titleEl) {
+        titleEl.classList.remove('error');
+        errorMsg.textContent = '';
+    }
     saveDraft();
 });
-authorEl.addEventListener('input', saveDraft);
 
 window.onload = () => {
     if (window.location.pathname === '/') {

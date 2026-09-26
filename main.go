@@ -17,6 +17,7 @@ import (
 	"io"
 	"io/fs"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -94,11 +95,14 @@ func allowRequest(ip string, isArticle bool) bool {
 }
 
 func getIP(r *http.Request) string {
-	ip := r.Header.Get("X-Forwarded-For")
-	if ip == "" {
-		ip = strings.Split(r.RemoteAddr, ":")[0]
+	if xff := r.Header.Get("X-Forwarded-For"); xff != "" {
+		return strings.TrimSpace(strings.Split(xff, ",")[0])
 	}
-	return ip
+	host, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		return r.RemoteAddr
+	}
+	return host
 }
 
 // --- UTILS ---
@@ -527,8 +531,8 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /", handleHome)
-	mux.HandleFunc("GET /privacy", handlePrivacy)
-	mux.HandleFunc("GET /terms", handleTerms)
+	mux.HandleFunc("GET /privacy", renderPage("privacy.html"))
+	mux.HandleFunc("GET /terms", renderPage("terms.html"))
 	mux.HandleFunc("GET /{slug}", handleArticle)
 	mux.HandleFunc("GET /edit/{slug}", handleEditPage)
 	
@@ -551,15 +555,12 @@ func handleFetchUrl(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var req struct {
-		URL  string `json:"url"`
-		Type string `json:"type"`
+		URL string `json:"url"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
 	}
-
-	// For now, treat both as image fetch to satisfy user.
 	resp, err := http.Get(req.URL)
 	if err != nil || resp.StatusCode != 200 {
 		http.Error(w, "Failed to fetch", http.StatusInternalServerError)
@@ -627,18 +628,11 @@ func createThumbnail(imgPath string) {
 	jpeg.Encode(thumbOut, dst, &jpeg.Options{Quality: 80})
 }
 
-func handlePrivacy(w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Content-Type", "text/html; charset=utf-8")
-    err := tmpl.ExecuteTemplate(w, "privacy.html", nil)
-    if err != nil {
-        http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-    }
-}
-
-func handleTerms(w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Content-Type", "text/html; charset=utf-8")
-    err := tmpl.ExecuteTemplate(w, "terms.html", nil)
-    if err != nil {
-        http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-    }
+func renderPage(name string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		if err := tmpl.ExecuteTemplate(w, name, nil); err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+	}
 }
