@@ -17,6 +17,7 @@ import (
 	"io"
 	"io/fs"
 	"log"
+	"mime"
 	"net"
 	"net/http"
 	"os"
@@ -404,29 +405,7 @@ func handleUpload(w http.ResponseWriter, r *http.Request) {
 	out.Close()
 
 	// Generate WhatsApp Thumbnail (<300KB)
-	bounds := img.Bounds()
-	width, height := bounds.Dx(), bounds.Dy()
-	
-	targetW, targetH := 1200, 630
-	if width > targetW || height > targetH {
-		ratio := float64(width) / float64(height)
-		if ratio > float64(targetW)/float64(targetH) {
-			width = targetW
-			height = int(float64(targetW) / ratio)
-		} else {
-			height = targetH
-			width = int(float64(targetH) * ratio)
-		}
-	}
-
-	dst := image.NewRGBA(image.Rect(0, 0, width, height))
-	draw.BiLinear.Scale(dst, dst.Rect, img, bounds, draw.Over, nil)
-
-	thumbName := fmt.Sprintf("thumb_%s.jpg", id)
-	thumbPath := filepath.Join(uploads, thumbName)
-	tout, _ := os.Create(thumbPath)
-	jpeg.Encode(tout, dst, &jpeg.Options{Quality: 75})
-	tout.Close()
+	createThumbnail(imgPath)
 
 	json.NewEncoder(w).Encode(map[string]string{
 		"url": "/uploads/" + imgName,
@@ -511,8 +490,14 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /", handleHome)
-	mux.HandleFunc("GET /privacy", renderPage("privacy.html"))
-	mux.HandleFunc("GET /terms", renderPage("terms.html"))
+	mux.HandleFunc("GET /privacy", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		tmpl.ExecuteTemplate(w, "privacy.html", nil)
+	})
+	mux.HandleFunc("GET /terms", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		tmpl.ExecuteTemplate(w, "terms.html", nil)
+	})
 	mux.HandleFunc("GET /{slug}", handleArticle)
 	mux.HandleFunc("GET /edit/{slug}", handleEditPage)
 	
@@ -554,10 +539,8 @@ func handleFetchUrl(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ext := ".jpg"
-	if strings.Contains(resp.Header.Get("Content-Type"), "png") {
-		ext = ".png"
-	} else if strings.Contains(resp.Header.Get("Content-Type"), "gif") {
-		ext = ".gif"
+	if exts, err := mime.ExtensionsByType(resp.Header.Get("Content-Type")); err == nil && len(exts) > 0 {
+		ext = exts[0]
 	}
 
 	fileName := "img_" + randHex(8) + ext
@@ -608,11 +591,4 @@ func createThumbnail(imgPath string) {
 	jpeg.Encode(thumbOut, dst, &jpeg.Options{Quality: 80})
 }
 
-func renderPage(name string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		if err := tmpl.ExecuteTemplate(w, name, nil); err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		}
-	}
-}
+

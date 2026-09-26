@@ -218,7 +218,7 @@ if (formatBubble) {
                     const block = getActiveBlock(node);
                     if (block) {
                         const tag = action === 'h1' ? 'h1' : action === 'h2' ? 'h2' : 'blockquote';
-                        transformBlock(block, block.tagName.toLowerCase() === tag ? 'p' : tag, block.textContent);
+                        document.execCommand('formatBlock', false, block.tagName.toLowerCase() === tag ? 'p' : tag);
                     }
                 }
                 updateFormatBubble();
@@ -657,16 +657,10 @@ if (canvasEl) {
 }
 
 function transformBlock(node, tag, text) {
-    const el = document.createElement(tag);
-    if (!text || text.trim() === '') {
-        el.innerHTML = '<br>';
-    } else {
-        el.textContent = text;
-    }
-    node.parentNode.replaceChild(el, node);
-    el.focus();
-    const target = el.firstChild && el.firstChild.nodeType === 3 ? el.firstChild : el;
+    node.textContent = (text === undefined || text.trim() === '') ? '\u200B' : text;
+    const target = node.firstChild && node.firstChild.nodeType === 3 ? node.firstChild : node;
     setCaret(target, target.nodeType === 3 ? target.length : 0);
+    document.execCommand('formatBlock', false, tag);
 }
 
 // Markdown input formatting & Live URL tooltip detection
