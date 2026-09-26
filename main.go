@@ -1,4 +1,4 @@
-package main
+﻿package main
 
 import (
 	"crypto/rand"
@@ -527,6 +527,8 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /", handleHome)
+	mux.HandleFunc("GET /privacy", handlePrivacy)
+	mux.HandleFunc("GET /terms", handleTerms)
 	mux.HandleFunc("GET /{slug}", handleArticle)
 	mux.HandleFunc("GET /edit/{slug}", handleEditPage)
 	
@@ -623,4 +625,20 @@ func createThumbnail(imgPath string) {
 	thumbOut, _ := os.Create(thumbPath)
 	defer thumbOut.Close()
 	jpeg.Encode(thumbOut, dst, &jpeg.Options{Quality: 80})
+}
+
+func handlePrivacy(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Content-Type", "text/html; charset=utf-8")
+    err := tmpl.ExecuteTemplate(w, "privacy.html", nil)
+    if err != nil {
+        http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+    }
+}
+
+func handleTerms(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Content-Type", "text/html; charset=utf-8")
+    err := tmpl.ExecuteTemplate(w, "terms.html", nil)
+    if err != nil {
+        http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+    }
 }
