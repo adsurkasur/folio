@@ -162,24 +162,35 @@ function updateFormatBubble() {
     }
 
     const sel = window.getSelection();
-    if (!sel.rangeCount || sel.isCollapsed) {
+    if (!sel.rangeCount) {
         hideFormatBubble();
         return;
     }
     
     const range = sel.getRangeAt(0);
-    if (!canvasEl.contains(range.commonAncestorContainer)) {
-        hideFormatBubble();
-        return;
-    }
-    const text = sel.toString().trim();
-    if (!text) {
-        hideFormatBubble();
-        return;
+    let linkNode = null;
+    
+    if (sel.isCollapsed) {
+        let node = range.startContainer;
+        if (node.nodeType === 3) node = node.parentNode;
+        linkNode = node.closest('a');
+        if (!linkNode || !canvasEl.contains(linkNode)) {
+            hideFormatBubble();
+            return;
+        }
+    } else {
+        if (!canvasEl.contains(range.commonAncestorContainer)) {
+            hideFormatBubble();
+            return;
+        }
+        const text = sel.toString().trim();
+        if (!text) {
+            hideFormatBubble();
+            return;
+        }
     }
     
-
-    const rect = range.getBoundingClientRect();
+    const rect = linkNode ? linkNode.getBoundingClientRect() : range.getBoundingClientRect();
     let top = rect.top - 48 + window.scrollY;
     if (rect.top < 54) {
         top = rect.bottom + 8 + window.scrollY;
@@ -190,6 +201,19 @@ function updateFormatBubble() {
         resetBubbleLink();
     }
     formatBubble.classList.add('active');
+
+    if (linkNode) {
+        const btnRow = formatBubble.querySelector('.folio-bubble-buttons');
+        const linkBox = formatBubble.querySelector('.folio-bubble-link-box');
+        const linkInput = formatBubble.querySelector('.folio-bubble-input');
+        if (btnRow) btnRow.style.display = 'none';
+        if (linkBox) linkBox.style.display = 'flex';
+        if (linkInput) {
+            linkInput.value = linkNode.getAttribute('href') || '';
+            savedBubbleRange = document.createRange();
+            savedBubbleRange.selectNodeContents(linkNode);
+        }
+    }
 }
 
 // Format Bubble Event Listeners
@@ -529,30 +553,30 @@ if (canvasEl) {
         const sel = window.getSelection();
         if (!sel.rangeCount) return;
         
-        // Let native browser handle selections (e.g. Ctrl+A -> Backspace)
+        // Let native browser handle selections
         if (!sel.isCollapsed && (e.key === 'Backspace' || e.key === 'Delete' || e.key === 'Enter')) {
-            if (e.key === 'Backspace' || e.key === 'Delete') {
-                e.preventDefault();
-                const range = sel.getRangeAt(0);
-                if (range.commonAncestorContainer === canvasEl || range.commonAncestorContainer.parentNode === canvasEl) {
-                    const textLen = sel.toString().length;
-                    const canvasLen = canvasEl.textContent.length;
-                    if (textLen >= canvasLen - 1) { // selected almost everything
-                        canvasEl.innerHTML = '<p><br></p>';
-                        setCaret(canvasEl.firstElementChild, 0);
-                        updatePlaceholder();
-                        return;
-                    }
+            e.preventDefault();
+            
+            // Manually remove figures that are part of the selection to prevent browser native delete bugs
+            canvasEl.querySelectorAll('figure').forEach(fig => {
+                if (sel.containsNode(fig, true)) {
+                    fig.remove();
                 }
-                document.execCommand('delete', false, null);
-                setTimeout(() => {
-                    if (canvasEl.innerHTML.trim() === '' || canvasEl.innerHTML === '<br>') {
-                        canvasEl.innerHTML = '<p><br></p>';
-                        setCaret(canvasEl.firstElementChild, 0);
-                    }
-                    updatePlaceholder();
-                }, 10);
+            });
+
+            document.execCommand('delete', false, null);
+            
+            if (e.key === 'Enter') {
+                document.execCommand('insertParagraph', false, null);
             }
+
+            setTimeout(() => {
+                if (canvasEl.innerHTML.trim() === '' || canvasEl.innerHTML === '<br>') {
+                    canvasEl.innerHTML = '<p><br></p>';
+                    setCaret(canvasEl.firstElementChild, 0);
+                }
+                updatePlaceholder();
+            }, 10);
             return;
         }
 
