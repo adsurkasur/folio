@@ -287,7 +287,7 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: var(--text-muted);
+    color: var(--text-color);
     transition: all 0.2s ease;
     outline: none;
 }
@@ -307,6 +307,9 @@ body {
         left: auto;
         right: 20px;
     }
+    }
+    .folio-canvas {
+        padding-right: 60px;
 }
 @media (max-width: 600px) {
     .folio-container {
@@ -318,7 +321,7 @@ body {
     }
     .folio-inputs {
         padding-right: 0;
-        width: 100%;
+    color: var(--text-color);
     }
     .folio-actions {
         position: fixed;
@@ -330,7 +333,7 @@ body {
     }
     /* Match desktop pill identically, just add shadow */
     .folio-actions .folio-btn {
-    background-color: var(--bg-color);
+    
 
     }
     .folio-actions .folio-btn:active {
