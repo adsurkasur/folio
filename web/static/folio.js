@@ -154,6 +154,11 @@ function updateFormatBubble() {
         hideFormatBubble();
         return;
     }
+    const range = sel.getRangeAt(0);
+    if (!canvasEl.contains(range.commonAncestorContainer)) {
+        hideFormatBubble();
+        return;
+    }
     const text = sel.toString().trim();
     if (!text) {
         hideFormatBubble();
@@ -306,7 +311,7 @@ document.addEventListener('mousedown', (e) => {
 
 document.addEventListener('mouseup', () => {
     isMouseSelecting = false;
-    updateFormatBubble();
+    setTimeout(updateFormatBubble, 50);
 });
 
 document.addEventListener('selectionchange', () => {
@@ -639,7 +644,25 @@ if (canvasEl) {
         }
 
         // Backspace handling: escape blockquote, heading, pre when empty
-        if (e.key === 'Backspace' && block) {
+        if (e.key === 'Backspace' && block && sel.isCollapsed) {
+            // Jump to figure caption if at the start of a block immediately following a figure
+            if (sel.anchorOffset === 0 && (sel.anchorNode === block || sel.anchorNode === block.firstChild)) {
+                const prevNode = block.previousElementSibling;
+                if (prevNode && prevNode.tagName === 'FIGURE') {
+                    e.preventDefault();
+                    const figcap = prevNode.querySelector('figcaption');
+                    if (figcap) {
+                        figcap.focus();
+                        const target = figcap.lastChild && figcap.lastChild.nodeType === 3 ? figcap.lastChild : figcap;
+                        setCaret(target, target.textContent ? target.textContent.length : 0);
+                        if (block.textContent.replace(/\u200B/g, '').trim() === '') {
+                            block.remove();
+                        }
+                    }
+                    return;
+                }
+            }
+
             const tag = block.tagName;
             if (['BLOCKQUOTE', 'H1', 'H2', 'H3', 'PRE'].includes(tag)) {
                 const text = block.textContent.replace(/\u200B/g, '').trim();
