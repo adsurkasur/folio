@@ -1,6 +1,17 @@
-# Folio
+<div align="center">
+  <img src="assets/logo.svg" alt="Folio Logo" width="120" />
+  <h1>Folio</h1>
+  <p><strong>A lightning-fast, ultra-minimalist, zero-dependency self-hosted publishing platform.</strong></p>
 
-Folio is a lightning-fast, ultra-minimalist, and zero-dependency self-hosted publishing platform inspired by Telegra.ph. It is designed to be deployed as a single Go binary, offering a distraction-free editorial experience with enterprise-grade security features and a mathematically strict UI design.
+  [![Website Status](https://img.shields.io/website?url=https%3A%2F%2Ffolio.arinahub.com&style=for-the-badge&label=folio.arinahub.com)](https://folio.arinahub.com)
+  [![Go Version](https://img.shields.io/github/go-mod/go-version/adsurkasur/folio?style=for-the-badge&color=00ADD8)](https://github.com/adsurkasur/folio/blob/master/go.mod)
+  [![License](https://img.shields.io/github/license/adsurkasur/folio?style=for-the-badge)](https://github.com/adsurkasur/folio/blob/master/LICENSE)
+  [![Last Commit](https://img.shields.io/github/last-commit/adsurkasur/folio?style=for-the-badge&color=success)](https://github.com/adsurkasur/folio/commits/master)
+</div>
+
+<br>
+
+Folio is designed to be deployed as a single Go binary, offering a distraction-free editorial experience with enterprise-grade security features and a mathematically strict UI design. Inspired by Telegra.ph.
 
 ## Why Folio?
 
