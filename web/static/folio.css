@@ -95,6 +95,7 @@ body {
 
 /* Inputs & Compact Sizes */
 .folio-title, .folio-author {
+    margin-top: 0;
     margin-bottom: 10px;
     color: var(--text-color);
     width: 100%;
@@ -175,6 +176,7 @@ body {
 }
 
 .folio-canvas p {
+    margin-top: 0;
     margin-bottom: 10px;
     
     transition: all 0.2s ease;
@@ -244,6 +246,7 @@ body {
 }
 
 .folio-canvas ul, .folio-canvas ol {
+    margin-top: 0;
     padding-left: 28px;
     margin: 8px 0;
 }
