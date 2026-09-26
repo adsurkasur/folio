@@ -291,12 +291,21 @@ body {
     margin: var(--space-5) 0;
     text-align: center;
 }
+@keyframes folioFadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 .folio-canvas figure img, .folio-canvas img {
     max-width: 100%;
     border-radius: 8px;
     display: block;
     margin: 0 auto;
-    transition: opacity 0.3s ease, box-shadow 0.2s ease;
+    opacity: 0;
+    transition: box-shadow 0.2s ease;
+}
+.folio-canvas figure img.loaded, .folio-canvas img.loaded {
+    animation: folioFadeIn 0.5s ease-out forwards;
 }
 .folio-canvas[contenteditable="true"] figure.focus img {
     box-shadow: 0 0 0 3px var(--accent);
@@ -391,7 +400,9 @@ body {
 .folio-modal-overlay {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     z-index: 2000;
     display: flex;
     align-items: center;
@@ -409,7 +420,8 @@ body {
     padding: var(--space-5) var(--space-6); /* 32px 40px */
     border-radius: 12px;
     text-align: center;
-    border: 1px solid var(--border);
+    border: 1px solid rgba(128, 128, 128, 0.15);
+    box-shadow: 0 16px 40px var(--shadow);
     transform: scale(0.9);
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     font-family: var(--ui-font);

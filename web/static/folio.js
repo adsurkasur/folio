@@ -1,3 +1,18 @@
+let embedMode = null;
+let isArticleEditing = false;
+let savedBubbleRange = null;
+let isMouseSelecting = false;
+
+function switchButtonText(btn, text) {
+    if (btn.textContent === text) return;
+    btn.style.opacity = '0';
+    btn.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+        btn.textContent = text;
+        btn.style.opacity = '1';
+        btn.style.transform = 'scale(1)';
+    }, 150);
+}
 const titleEl = document.getElementById('title');
 const authorEl = document.getElementById('author');
 const authorDot = document.getElementById('authorDot');
@@ -12,10 +27,7 @@ const formatBubble = document.getElementById('formatBubble');
 const linkTooltip = document.getElementById('linkTooltip');
 
 let currentActiveNode = null;
-let embedMode = null;
-let isArticleEditing = false;
-let savedBubbleRange = null;
-let isMouseSelecting = false;
+
 
 function setCaret(node, offset = 0) {
     const range = document.createRange();
@@ -396,6 +408,7 @@ function insertFigureWithImage(targetEl, src) {
     figure.tabIndex = -1; // make it focusable/selectable
 
     const img = document.createElement('img');
+    img.onload = () => img.classList.add('loaded');
     img.src = src;
     figure.appendChild(img);
 
@@ -927,7 +940,7 @@ if (editBtn) {
             if (fc.textContent.trim() === '') fc.classList.add('empty');
         });
 
-        editBtn.textContent = 'SAVE';
+        switchButtonText(editBtn, 'SAVE');
         updatePlaceholder();
         titleEl.focus();
     }
@@ -942,7 +955,7 @@ if (editBtn) {
             return;
         }
 
-        editBtn.textContent = 'SAVING...';
+        switchButtonText(editBtn, 'SAVING...');
         try {
             const res = await fetch('/api/articles/' + slug, {
                 method: 'PUT',
@@ -966,7 +979,7 @@ if (editBtn) {
                 canvasEl.querySelectorAll('figcaption').forEach(fc => {
                     fc.contentEditable = 'false';
                 });
-                editBtn.textContent = 'EDIT';
+                switchButtonText(editBtn, 'EDIT');
                 hideFormatBubble();
                 hideLinkTooltip();
                 if (toolbar) toolbar.classList.remove('active');
@@ -977,10 +990,10 @@ if (editBtn) {
                     window.history.replaceState({}, '', '/' + slug);
                 }
             } else {
-                editBtn.textContent = 'SAVE';
+                switchButtonText(editBtn, 'SAVE');
             }
         } catch (err) {
-            editBtn.textContent = 'SAVE';
+            switchButtonText(editBtn, 'SAVE');
         }
     }
 
@@ -996,3 +1009,8 @@ if (editBtn) {
         enterInPlaceEdit();
     }
 }
+// Handle existing image fade-ins
+document.querySelectorAll('.folio-canvas img').forEach(img => {
+    if (img.complete) img.classList.add('loaded');
+    else img.onload = () => img.classList.add('loaded');
+});
