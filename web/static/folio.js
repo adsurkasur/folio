@@ -118,7 +118,7 @@ function hideFormatBubble() {
             if (!formatBubble.classList.contains('active')) {
                 resetBubbleLink();
             }
-        }, 200);
+        }, 400); // 400ms ensures fade-out completes before resetting DOM
     }
 }
 
@@ -172,6 +172,9 @@ function updateFormatBubble() {
     }
     formatBubble.style.top = top + 'px';
     formatBubble.style.left = (rect.left + rect.width / 2) + 'px';
+    if (!formatBubble.classList.contains('active')) {
+        resetBubbleLink();
+    }
     formatBubble.classList.add('active');
 }
 
