@@ -1,7 +1,8 @@
-const titleEl = document.getElementById('title');
+﻿const titleEl = document.getElementById('title');
 const authorEl = document.getElementById('author');
 const canvasEl = document.getElementById('canvas');
 const publishBtn = document.getElementById('publishBtn');
+const errorMsg = document.getElementById('errorMsg');
 const toolbar = document.getElementById('mediaToolbar');
 const btnCamera = document.getElementById('btnCamera');
 const btnEmbed = document.getElementById('btnEmbed');
@@ -164,7 +165,11 @@ function saveDraft() {
     }
 }
 
-titleEl.addEventListener('input', saveDraft);
+titleEl.addEventListener('input', () => {
+    titleEl.classList.remove('error');
+    errorMsg.textContent = '';
+    saveDraft();
+});
 authorEl.addEventListener('input', saveDraft);
 
 window.onload = () => {
@@ -180,6 +185,13 @@ window.onload = () => {
 };
 
 publishBtn.addEventListener('click', async () => {
+    if (!titleEl.value.trim()) {
+        titleEl.classList.add('error');
+        errorMsg.textContent = 'Title is too small';
+        titleEl.focus();
+        return;
+    }
+
     const html = canvasEl.innerHTML;
     const isEdit = window.location.pathname.startsWith('/edit/');
     const url = isEdit ? '/api/articles/' + window.location.pathname.split('/').pop() : '/api/articles';
@@ -202,6 +214,6 @@ publishBtn.addEventListener('click', async () => {
         localStorage.removeItem('folio_draft_content');
         window.location.href = '/' + data.slug;
     } else {
-        alert("Failed to publish");
+        errorMsg.textContent = 'Failed to publish';
     }
 });

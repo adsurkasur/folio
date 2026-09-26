@@ -4,24 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Folio</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✍️</text></svg>">
-    <link rel="stylesheet" href="/static/folio.css?v=3">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22black%22/><text x=%2250%22 y=%2275%22 font-family=%22serif%22 font-style=%22italic%22 font-size=%2280%22 fill=%22white%22 text-anchor=%22middle%22>ƒ</text></svg>">
+    <link rel="stylesheet" href="/static/folio.css?v=4">
 </head>
 <body>
     <div class="folio-container">
-        <header class="folio-header">
-            <button id="publishBtn" class="folio-btn">PUBLISH</button>
-        </header>
-
         <main>
-            <div class="folio-input-group">
-                <input type="text" id="title" class="folio-title" placeholder="Title" value="">
-                <span class="folio-label title-label">Title</span>
-            </div>
-            
-            <div class="folio-input-group">
-                <input type="text" id="author" class="folio-author" placeholder="Your name" value="">
-                <span class="folio-label author-label">Author</span>
+            <div class="folio-top-row">
+                <div class="folio-inputs">
+                    <div class="folio-input-group">
+                        <input type="text" id="title" class="folio-title" placeholder="Title" value="">
+                        <span class="folio-label title-label">Title</span>
+                    </div>
+                    
+                    <div class="folio-input-group">
+                        <input type="text" id="author" class="folio-author" placeholder="Your name" value="">
+                        <span class="folio-label author-label">Author</span>
+                    </div>
+                </div>
+                <div class="folio-actions">
+                    <button id="publishBtn" class="folio-btn">PUBLISH</button>
+                    <div id="errorMsg" class="folio-error"></div>
+                </div>
             </div>
 
             <div id="mediaToolbar" class="folio-toolbar">
@@ -34,6 +38,6 @@
             <div id="canvas" class="folio-canvas" contenteditable="true" data-placeholder="Your story..."></div>
         </main>
     </div>
-    <script src="/static/folio.js?v=2"></script>
+    <script src="/static/folio.js?v=4"></script>
 </body>
 </html>

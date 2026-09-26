@@ -13,22 +13,25 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content="{{.Thumbnail}}">
     {{end}}
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✍️</text></svg>">
-    <link rel="stylesheet" href="/static/folio.css?v=3">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22black%22/><text x=%2250%22 y=%2275%22 font-family=%22serif%22 font-style=%22italic%22 font-size=%2280%22 fill=%22white%22 text-anchor=%22middle%22>ƒ</text></svg>">
+    <link rel="stylesheet" href="/static/folio.css?v=4">
 </head>
 <body>
     <div class="folio-container">
-        {{if .CanEdit}}
-        <header class="folio-header">
-            <a href="/edit/{{.Slug}}" class="folio-btn" style="margin-right: 10px; text-decoration: none;">EDIT</a>
-            <button onclick="deleteArticle('{{.Slug}}')" class="folio-btn" style="color: #ff4444; border-color: #ff4444;">DELETE</button>
-        </header>
-        {{end}}
-
         <main>
-            <h1 class="folio-title" style="margin-bottom: 0;">{{.Title}}</h1>
-            <div class="folio-author" style="margin-bottom: 30px;">
-                {{.Author}} &middot; <span>{{.Views}} views</span> &middot; <span>{{.Date}}</span>
+            <div class="folio-top-row">
+                <div class="folio-inputs">
+                    <h1 class="folio-title" style="margin-bottom: 8px;">{{.Title}}</h1>
+                    <div class="folio-author" style="margin-bottom: 20px;">
+                        {{.Author}} &middot; <span>{{.Views}} views</span> &middot; <span>{{.Date}}</span>
+                    </div>
+                </div>
+                {{if .CanEdit}}
+                <div class="folio-actions">
+                    <a href="/edit/{{.Slug}}" class="folio-btn" style="text-decoration: none; margin-bottom: 10px; display: inline-block; text-align: center;">EDIT</a>
+                    <button onclick="deleteArticle('{{.Slug}}')" class="folio-btn" style="color: #ff4d4d; border-color: #ff4d4d;">DELETE</button>
+                </div>
+                {{end}}
             </div>
             
             <div class="folio-canvas">
