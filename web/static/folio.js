@@ -532,6 +532,19 @@ if (canvasEl) {
         // Let native browser handle selections (e.g. Ctrl+A -> Backspace)
         if (!sel.isCollapsed && (e.key === 'Backspace' || e.key === 'Delete' || e.key === 'Enter')) {
             if (e.key === 'Backspace' || e.key === 'Delete') {
+                e.preventDefault();
+                const range = sel.getRangeAt(0);
+                if (range.commonAncestorContainer === canvasEl || range.commonAncestorContainer.parentNode === canvasEl) {
+                    const textLen = sel.toString().length;
+                    const canvasLen = canvasEl.textContent.length;
+                    if (textLen >= canvasLen - 1) { // selected almost everything
+                        canvasEl.innerHTML = '<p><br></p>';
+                        setCaret(canvasEl.firstElementChild, 0);
+                        updatePlaceholder();
+                        return;
+                    }
+                }
+                document.execCommand('delete', false, null);
                 setTimeout(() => {
                     if (canvasEl.innerHTML.trim() === '' || canvasEl.innerHTML === '<br>') {
                         canvasEl.innerHTML = '<p><br></p>';
