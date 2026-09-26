@@ -3,39 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Folio</title>
+    <title>Draft</title>
     <link rel="stylesheet" href="/static/folio.css">
+    <style>
+        /* Embed placeholders */
+        .embed-placeholder {
+            font-style: italic;
+            color: var(--text-muted);
+            font-family: var(--ui-font);
+        }
+    </style>
 </head>
 <body>
     <div class="folio-container">
         <header class="folio-header">
-            <a href="/" class="folio-logo">Folio</a>
-            <button id="publishBtn" class="folio-btn">{{if .IsEdit}}Save{{else}}Publish{{end}}</button>
+            <button id="publishBtn" class="folio-btn">PUBLISH</button>
         </header>
 
         <main>
-            <input type="text" id="title" class="folio-title" placeholder="Title" value="{{if .Article}}{{.Article.Title}}{{end}}">
-            <input type="text" id="author" class="folio-author" placeholder="Your name" value="{{if .Article}}{{.Article.AuthorName}}{{end}}">
+            <div class="folio-input-group">
+                <input type="text" id="title" class="folio-title" placeholder="Title" value="">
+                <span class="folio-label title-label">Title</span>
+            </div>
             
-            <div id="canvas" class="folio-canvas" contenteditable="true" placeholder="Your story...">{{if .Article}}{{.Article.ContentHTML}}{{end}}</div>
+            <div class="folio-input-group">
+                <input type="text" id="author" class="folio-author" placeholder="Your name" value="">
+                <span class="folio-label author-label">Author</span>
+            </div>
+
+            <!-- Media Toolbar (absolute positioned dynamically) -->
+            <div id="mediaToolbar" class="folio-toolbar">
+                <button class="folio-toolbar-btn" id="btnEmbed">&lt;&gt;</button>
+                <button class="folio-toolbar-btn" id="btnCamera">??</button>
+            </div>
+
+            <div id="canvas" class="folio-canvas" contenteditable="true" data-placeholder="Your story..."></div>
         </main>
     </div>
-
-    <!-- Bubble Menu -->
-    <div id="bubble" class="folio-bubble">
-        <button class="bubble-btn" data-action="bold">B</button>
-        <button class="bubble-btn" data-action="italic">I</button>
-        <button class="bubble-btn" data-action="h1">H1</button>
-        <button class="bubble-btn" data-action="h2">H2</button>
-        <button class="bubble-btn" data-action="blockquote">”</button>
-        <button class="bubble-btn" data-action="link">🔗</button>
-    </div>
-
-    {{if .IsEdit}}
-    <script>
-        document.getElementById('publishBtn').dataset.slug = "{{.Article.Slug}}";
-    </script>
-    {{end}}
     <script src="/static/folio.js"></script>
 </body>
 </html>

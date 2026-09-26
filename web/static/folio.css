@@ -1,180 +1,185 @@
 :root {
-  --bg: #fff;
-  --text: #333;
-  --muted: #888;
-  --border: #eaeaea;
-  --bubble-bg: #222;
-  --bubble-text: #fff;
-  --font-serif: "Lora", "Merriweather", "Georgia", serif;
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --bg-color: #ffffff;
+    --text-color: #1a1a1a;
+    --text-muted: #b3b3b3;
+    --accent: #000000;
+    --border: #e0e0e0;
+    --ui-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --content-font: "Lora", "Merriweather", "Georgia", serif;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #1a1a1a;
-    --text: #e0e0e0;
-    --muted: #a0a0a0;
-    --border: #333;
-    --bubble-bg: #e0e0e0;
-    --bubble-text: #1a1a1a;
-  }
+    :root {
+        --bg-color: #000000;
+        --text-color: #f0f0f0;
+        --text-muted: #666666;
+        --accent: #ffffff;
+        --border: #333333;
+    }
 }
 
 body {
-  font-family: var(--font-serif);
-  background-color: var(--bg);
-  color: var(--text);
-  margin: 0;
-  padding: 0;
-  line-height: 1.6;
-  font-size: 18px;
+    font-family: var(--content-font);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 .folio-container {
-  max-width: 740px;
-  margin: 0 auto;
-  padding: 40px 20px;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    position: relative;
+}
+
+/* UI Elements use Sans-Serif */
+.folio-header, .folio-btn, .folio-label, .folio-toolbar {
+    font-family: var(--ui-font);
 }
 
 .folio-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
-  font-family: var(--font-sans);
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 40px;
 }
 
+/* Hide Logo as requested */
 .folio-logo {
-  font-weight: bold;
-  font-size: 1.5rem;
-  text-decoration: none;
-  color: var(--text);
+    display: none;
 }
 
 .folio-btn {
-  background: none;
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 6px 14px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  font-family: var(--font-sans);
-  transition: all 0.2s;
+    background-color: var(--bg-color);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 6px 16px;
+    border-radius: 50px; /* Pill shape */
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
 }
 
 .folio-btn:hover {
-  background: var(--text);
-  color: var(--bg);
+    background-color: var(--accent);
+    color: var(--bg-color);
 }
 
-.folio-btn.danger {
-  border-color: #ff4444;
-  color: #ff4444;
-}
-.folio-btn.danger:hover {
-  background: #ff4444;
-  color: #fff;
+.folio-input-group {
+    position: relative;
+    margin-bottom: 15px;
 }
 
-/* Editor Inputs */
-input.folio-title {
-  width: 100%;
-  border: none;
-  background: transparent;
-  font-family: var(--font-serif);
-  font-size: 3rem;
-  font-weight: bold;
-  color: var(--text);
-  outline: none;
-  margin-bottom: 10px;
+/* Floating Labels */
+.folio-label {
+    position: absolute;
+    left: -70px;
+    top: 15px;
+    color: var(--text-muted);
+    font-size: 14px;
+    text-align: right;
+    width: 50px;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: all 0.3s ease;
+    pointer-events: none;
 }
 
-input.folio-author {
-  width: 100%;
-  border: none;
-  background: transparent;
-  font-family: var(--font-sans);
-  font-size: 1rem;
-  color: var(--muted);
-  outline: none;
-  margin-bottom: 20px;
+/* Inputs */
+.folio-title, .folio-author {
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: var(--text-color);
+    outline: none;
 }
 
-.folio-meta {
-  font-family: var(--font-sans);
-  font-size: 1rem;
-  color: var(--muted);
-  margin-bottom: 30px;
-  display: flex;
-  justify-content: space-between;
+.folio-title {
+    font-size: 42px;
+    font-weight: bold;
+    font-family: var(--content-font);
+    padding: 10px 0;
 }
 
-/* Canvas */
+.folio-author {
+    font-size: 18px;
+    font-family: var(--ui-font);
+    color: var(--accent);
+    padding: 5px 0;
+    margin-bottom: 20px;
+}
+
+.folio-title:focus ~ .folio-label.title-label,
+.folio-title:not(:placeholder-shown) ~ .folio-label.title-label,
+.folio-author:focus ~ .folio-label.author-label,
+.folio-author:not(:placeholder-shown) ~ .folio-label.author-label {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Content Canvas */
 .folio-canvas {
-  min-height: 50vh;
-  outline: none;
-}
-.folio-canvas p { margin-bottom: 1.5em; }
-.folio-canvas h1, .folio-canvas h2 { font-family: var(--font-sans); font-weight: 700; margin-top: 1.5em; margin-bottom: 0.5em; }
-.folio-canvas h1 { font-size: 2rem; }
-.folio-canvas h2 { font-size: 1.5rem; }
-.folio-canvas blockquote {
-  border-left: 3px solid var(--text);
-  margin: 1.5em 0;
-  padding-left: 1em;
-  font-style: italic;
-  color: var(--muted);
-}
-.folio-canvas img, .folio-canvas iframe {
-  max-width: 100%;
-  height: auto;
-  border-radius: 4px;
-  display: block;
-  margin: 2em auto;
-}
-.folio-canvas figure {
-  margin: 2em 0;
-  text-align: center;
-}
-.folio-canvas figcaption {
-  font-family: var(--font-sans);
-  font-size: 0.85rem;
-  color: var(--muted);
-  margin-top: 0.5em;
-  outline: none;
-}
-.folio-canvas a { color: var(--text); text-decoration: underline; }
-
-[contenteditable="true"]:empty:before {
-  content: attr(placeholder);
-  color: var(--muted);
-  pointer-events: none;
-  display: block;
+    font-size: 20px;
+    min-height: 400px;
+    outline: none;
+    margin-top: 10px;
+    white-space: pre-wrap;
 }
 
-/* Bubble Menu */
-.folio-bubble {
-  position: absolute;
-  background: var(--bubble-bg);
-  border-radius: 6px;
-  padding: 5px;
-  display: none;
-  gap: 5px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  z-index: 1000;
-  transform: translateX(-50%) translateY(-100%);
-  margin-top: -10px;
+.folio-canvas p {
+    margin: 0 0 20px 0;
 }
-.folio-bubble.active { display: flex; }
-.folio-bubble button {
-  background: none;
-  border: none;
-  color: var(--bubble-text);
-  cursor: pointer;
-  padding: 5px 10px;
-  font-family: var(--font-sans);
-  font-size: 14px;
-  font-weight: bold;
+
+.folio-canvas img {
+    max-width: 100%;
+    border-radius: 8px;
+    display: block;
+    margin: 20px auto;
 }
-.folio-bubble button:hover { opacity: 0.7; }
+
+/* Media Toolbar */
+.folio-toolbar {
+    position: absolute;
+    left: -80px;
+    display: flex;
+    gap: 10px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+    align-items: center;
+}
+
+.folio-toolbar.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.folio-toolbar-btn {
+    background: transparent;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-color);
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.folio-toolbar-btn:hover {
+    border-color: var(--text-color);
+}
+
+/* Mobile Adjustments */
+@media (max-width: 800px) {
+    .folio-label, .folio-toolbar {
+        display: none !important;
+    }
+}

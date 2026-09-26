@@ -515,6 +515,7 @@ func main() {
 	mux.HandleFunc("GET /edit/{slug}", handleEditPage)
 	
 	mux.HandleFunc("POST /api/upload", handleUpload)
+	mux.HandleFunc("POST /api/fetch-url", handleFetchUrl)
 	mux.HandleFunc("POST /api/articles", handlePublish)
 	mux.HandleFunc("PUT /api/articles/{slug}", handleUpdate)
 	mux.HandleFunc("DELETE /api/articles/{slug}", handleDelete)
@@ -525,4 +526,85 @@ func main() {
 
 	log.Printf("Folio running on :%s\n", *port)
 	log.Fatal(http.ListenAndServe(":"+*port, mux))
+}
+func handleFetchUrl(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	var req struct {
+		URL  string `json:"url"`
+		Type string `json:"type"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+
+	// For now, treat both as image fetch to satisfy user.
+	resp, err := http.Get(req.URL)
+	if err != nil || resp.StatusCode != 200 {
+		http.Error(w, "Failed to fetch", http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.ContentLength > 10*1024*1024 {
+		http.Error(w, "File too large", http.StatusRequestEntityTooLarge)
+		return
+	}
+
+	ext := ".jpg"
+	if strings.Contains(resp.Header.Get("Content-Type"), "png") {
+		ext = ".png"
+	} else if strings.Contains(resp.Header.Get("Content-Type"), "gif") {
+		ext = ".gif"
+	}
+
+	fileName := "img_" + randHex(8) + ext
+	filePath := filepath.Join(uploads, fileName)
+	
+	outFile, err := os.Create(filePath)
+	if err != nil {
+		http.Error(w, "Failed to save", http.StatusInternalServerError)
+		return
+	}
+	io.Copy(outFile, resp.Body)
+	outFile.Close()
+
+	// Create thumbnail
+	createThumbnail(filePath)
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{"url": "/uploads/" + fileName})
+}
+func createThumbnail(imgPath string) {
+	file, err := os.Open(imgPath)
+	if err != nil { return }
+	img, _, err := image.Decode(file)
+	file.Close()
+	if err != nil { return }
+
+	bounds := img.Bounds()
+	width, height := bounds.Dx(), bounds.Dy()
+	
+	targetW, targetH := 1200, 630
+	if width > targetW || height > targetH {
+		ratio := float64(width) / float64(height)
+		if ratio > float64(targetW)/float64(targetH) {
+			width = targetW
+			height = int(float64(targetW) / ratio)
+		} else {
+			height = targetH
+			width = int(float64(targetH) * ratio)
+		}
+	}
+
+	dst := image.NewRGBA(image.Rect(0, 0, width, height))
+	draw.CatmullRom.Scale(dst, dst.Bounds(), img, bounds, draw.Over, nil)
+
+	thumbPath := strings.Replace(imgPath, "img_", "thumb_", 1)
+	thumbOut, _ := os.Create(thumbPath)
+	defer thumbOut.Close()
+	jpeg.Encode(thumbOut, dst, &jpeg.Options{Quality: 80})
 }

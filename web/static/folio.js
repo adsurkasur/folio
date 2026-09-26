@@ -1,200 +1,207 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const canvas = document.getElementById('canvas');
-    if (!canvas) return; // Not on editor page
+const titleEl = document.getElementById('title');
+const authorEl = document.getElementById('author');
+const canvasEl = document.getElementById('canvas');
+const publishBtn = document.getElementById('publishBtn');
+const toolbar = document.getElementById('mediaToolbar');
+const btnCamera = document.getElementById('btnCamera');
+const btnEmbed = document.getElementById('btnEmbed');
 
-    const titleInput = document.getElementById('title');
-    const authorInput = document.getElementById('author');
-    const publishBtn = document.getElementById('publishBtn');
-    const bubble = document.getElementById('bubble');
+let currentActiveNode = null;
+let embedMode = null; // 'image' or 'embed'
+
+// Placeholder polyfill for contenteditable
+function updatePlaceholder() {
+    if (canvasEl.textContent.trim() === '' && canvasEl.children.length <= 1) {
+        canvasEl.classList.add('empty');
+    } else {
+        canvasEl.classList.remove('empty');
+    }
+}
+
+// Position Toolbar
+function updateToolbarPosition() {
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
     
-    let isEditMode = publishBtn.dataset.slug ? true : false;
-    let editSlug = publishBtn.dataset.slug || '';
-
-    // Auto-save logic
-    if (!isEditMode) {
-        const draft = JSON.parse(localStorage.getItem('folio_draft') || '{}');
-        if (draft.title) titleInput.value = draft.title;
-        if (draft.author) authorInput.value = draft.author;
-        if (draft.content) canvas.innerHTML = draft.content;
-
-        const saveDraft = () => {
-            localStorage.setItem('folio_draft', JSON.stringify({
-                title: titleInput.value,
-                author: authorInput.value,
-                content: canvas.innerHTML
-            }));
-        };
-        titleInput.addEventListener('input', saveDraft);
-        authorInput.addEventListener('input', saveDraft);
-        canvas.addEventListener('input', saveDraft);
+    let node = sel.anchorNode;
+    if (node.nodeType === 3) node = node.parentNode;
+    
+    // Ensure we are inside canvas
+    if (!canvasEl.contains(node)) {
+        toolbar.classList.remove('active');
+        return;
     }
 
-    // Markdown Auto-format & Auto-embed
-    canvas.addEventListener('keyup', (e) => {
-        if (e.key === ' ' || e.key === 'Enter') {
-            const sel = window.getSelection();
-            if (!sel.rangeCount) return;
-            const node = sel.anchorNode;
-            if (node.nodeType === 3) { // Text node
-                const text = node.textContent;
-                
-                // Embed Youtube
-                const ytMatch = text.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-                if (ytMatch && e.key === 'Enter') {
-                    const iframe = document.createElement('iframe');
-                    iframe.width = '100%';
-                    iframe.height = '400';
-                    iframe.src = `https://www.youtube.com/embed/${ytMatch[1]}`;
-                    iframe.frameBorder = '0';
-                    iframe.allowFullscreen = true;
-                    node.parentNode.replaceChild(iframe, node);
-                    return;
-                }
+    // Show toolbar if node is a top-level empty paragraph/div
+    if ((node === canvasEl || node.parentNode === canvasEl) && node.textContent.trim() === '') {
+        const rect = node.getBoundingClientRect();
+        const containerRect = document.querySelector('.folio-container').getBoundingClientRect();
+        
+        toolbar.style.top = (rect.top - containerRect.top + 5) + 'px';
+        toolbar.classList.add('active');
+        currentActiveNode = node === canvasEl ? null : node;
+    } else {
+        toolbar.classList.remove('active');
+        embedMode = null;
+    }
+}
 
-                // Markdown
-                if (text.startsWith('# ') && e.key === ' ') {
-                    document.execCommand('formatBlock', false, 'H1');
-                    node.textContent = text.substring(2);
-                } else if (text.startsWith('## ') && e.key === ' ') {
-                    document.execCommand('formatBlock', false, 'H2');
-                    node.textContent = text.substring(3);
-                } else if (text.startsWith('> ') && e.key === ' ') {
-                    document.execCommand('formatBlock', false, 'BLOCKQUOTE');
-                    node.textContent = text.substring(2);
-                }
-            }
-        }
-    });
-
-    // Bubble Menu Logic
-    document.addEventListener('selectionchange', () => {
-        const sel = window.getSelection();
-        if (sel.rangeCount > 0 && !sel.isCollapsed && canvas.contains(sel.anchorNode)) {
-            const range = sel.getRangeAt(0).getBoundingClientRect();
-            bubble.style.top = `${range.top + window.scrollY}px`;
-            bubble.style.left = `${range.left + (range.width / 2)}px`;
-            bubble.classList.add('active');
-        } else {
-            bubble.classList.remove('active');
-        }
-    });
-
-    document.querySelectorAll('.bubble-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const action = btn.dataset.action;
-            if (action === 'link') {
-                const url = prompt('Enter link URL:');
-                if (url) document.execCommand('createLink', false, url);
-            } else if (['h1', 'h2', 'blockquote'].includes(action)) {
-                document.execCommand('formatBlock', false, action);
-            } else {
-                document.execCommand(action, false, null);
-            }
-        });
-    });
-
-    // Image Upload (Paste & Drop)
-    const uploadImage = async (file, nodeToReplace) => {
-        const formData = new FormData();
-        formData.append('image', file);
-        try {
-            const res = await fetch('/api/upload', { method: 'POST', body: formData });
-            if (!res.ok) throw new Error('Upload failed');
-            const data = await res.json();
-            
-            const fig = document.createElement('figure');
-            fig.innerHTML = `<img src="${data.url}"><figcaption contenteditable="true" placeholder="Caption (optional)"></figcaption>`;
-            
-            if (nodeToReplace) {
-                nodeToReplace.parentNode.replaceChild(fig, nodeToReplace);
-            } else {
-                canvas.appendChild(fig);
-            }
-        } catch (err) {
-            alert('Upload failed: ' + err.message);
-        }
-    };
-
-    canvas.addEventListener('paste', (e) => {
-        const items = (e.clipboardData || e.originalEvent.clipboardData).items;
-        for (let item of items) {
-            if (item.type.indexOf('image') === 0) {
-                e.preventDefault();
-                const file = item.getAsFile();
-                
-                // Placeholder
-                const placeholder = document.createElement('p');
-                placeholder.textContent = 'Uploading...';
-                window.getSelection().getRangeAt(0).insertNode(placeholder);
-                
-                uploadImage(file, placeholder);
-            }
-        }
-    });
-
-    // Publish
-    publishBtn.addEventListener('click', async () => {
-        const payload = {
-            title: titleInput.value.trim() || 'Untitled',
-            author_name: authorInput.value.trim(),
-            content_html: canvas.innerHTML
-        };
-
-        const method = isEditMode ? 'PUT' : 'POST';
-        const url = isEditMode ? `/api/articles/${editSlug}` : '/api/articles';
-
-        // Include token if available in URL
-        const queryParams = new URLSearchParams(window.location.search);
-        const token = queryParams.get('token');
-        const fetchUrl = token ? `${url}?token=${token}` : url;
-
-        publishBtn.disabled = true;
-        publishBtn.textContent = 'Saving...';
-
-        try {
-            const res = await fetch(fetchUrl, {
-                method: method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            const data = await res.json();
-            
-            if (!res.ok) throw new Error(data.error || 'Failed to publish');
-
-            localStorage.removeItem('folio_draft');
-            
-            if (!isEditMode && data.edit_token) {
-                alert(`SUCCESS!\nSave this backup edit link:\n${window.location.origin}/${data.slug}?token=${data.edit_token}`);
-            }
-            window.location.href = `/${data.slug}`;
-        } catch (err) {
-            alert(err.message);
-            publishBtn.disabled = false;
-            publishBtn.textContent = isEditMode ? 'Save' : 'Publish';
-        }
-    });
+document.addEventListener('selectionchange', updateToolbarPosition);
+canvasEl.addEventListener('input', () => {
+    updatePlaceholder();
+    updateToolbarPosition();
+    saveDraft();
 });
 
-// Delete Logic (only for article page with edit access)
-const deleteBtn = document.getElementById('deleteBtn');
-if (deleteBtn) {
-    deleteBtn.addEventListener('click', async () => {
-        if (!confirm('Are you sure you want to permanently delete this article?')) return;
-        
-        const slug = deleteBtn.dataset.slug;
-        const queryParams = new URLSearchParams(window.location.search);
-        const token = queryParams.get('token');
-        const url = token ? `/api/articles/${slug}?token=${token}` : `/api/articles/${slug}`;
+// Toolbar Actions
+btnCamera.addEventListener('click', () => {
+    embedMode = 'image';
+    if(currentActiveNode) {
+        currentActiveNode.setAttribute('data-placeholder', 'Paste a link to image or video and press Enter');
+        currentActiveNode.classList.add('embed-placeholder');
+    }
+});
 
-        deleteBtn.disabled = true;
-        try {
-            const res = await fetch(url, { method: 'DELETE' });
-            if (!res.ok) throw new Error('Delete failed');
-            window.location.href = '/';
-        } catch (err) {
-            alert(err.message);
-            deleteBtn.disabled = false;
+btnEmbed.addEventListener('click', () => {
+    embedMode = 'embed';
+    if(currentActiveNode) {
+        currentActiveNode.setAttribute('data-placeholder', 'Paste a YouTube, Vimeo or Twitter link, and press Enter');
+        currentActiveNode.classList.add('embed-placeholder');
+    }
+});
+
+// Handle URL Enter for fetching
+canvasEl.addEventListener('keydown', async (e) => {
+    if (e.key === 'Enter') {
+        const sel = window.getSelection();
+        let node = sel.anchorNode;
+        if (node.nodeType === 3) node = node.parentNode;
+        
+        if (embedMode && node.textContent.trim().startsWith('http')) {
+            e.preventDefault();
+            const url = node.textContent.trim();
+            node.textContent = 'Fetching...';
+            
+            try {
+                const res = await fetch('/api/fetch-url', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ url, type: embedMode })
+                });
+                if(!res.ok) throw new Error('Fetch failed');
+                const data = await res.json();
+                
+                node.innerHTML = '';
+                const img = document.createElement('img');
+                img.src = data.url;
+                node.appendChild(img);
+                
+                const p = document.createElement('p');
+                p.innerHTML = '<br>';
+                node.parentNode.insertBefore(p, node.nextSibling);
+                
+                const range = document.createRange();
+                range.setStart(p, 0);
+                sel.removeAllRanges();
+                sel.addRange(range);
+                
+            } catch (err) {
+                node.textContent = '';
+                alert('Gagal mengambil gambar/link.');
+            }
+            embedMode = null;
+            node.classList.remove('embed-placeholder');
+        } else {
+            // Remove placeholder styling on normal enter
+            if (node.classList && node.classList.contains('embed-placeholder')) {
+                node.classList.remove('embed-placeholder');
+                embedMode = null;
+            }
         }
-    });
+    }
+});
+
+// Auto-format markdown headers
+canvasEl.addEventListener('input', (e) => {
+    const sel = window.getSelection();
+    if (!sel.anchorNode) return;
+    let node = sel.anchorNode;
+    if (node.nodeType === 3) node = node.parentNode;
+    
+    if (node.tagName === 'P' || node.tagName === 'DIV') {
+        const text = node.textContent;
+        if (text.startsWith('# ')) {
+            node.outerHTML = '<h1>' + text.substring(2) + '</h1>';
+            placeCaretAtEnd(canvasEl);
+        } else if (text.startsWith('## ')) {
+            node.outerHTML = '<h2>' + text.substring(3) + '</h2>';
+            placeCaretAtEnd(canvasEl);
+        } else if (text.startsWith('> ')) {
+            node.outerHTML = '<blockquote>' + text.substring(2) + '</blockquote>';
+            placeCaretAtEnd(canvasEl);
+        }
+    }
+});
+
+function placeCaretAtEnd(el) {
+    el.focus();
+    if (typeof window.getSelection != "undefined" && typeof document.createRange != "undefined") {
+        var range = document.createRange();
+        range.selectNodeContents(el);
+        range.collapse(false);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+    }
 }
+
+// Save & Publish
+function saveDraft() {
+    if (window.location.pathname === '/') {
+        localStorage.setItem('folio_draft_title', titleEl.value);
+        localStorage.setItem('folio_draft_author', authorEl.value);
+        localStorage.setItem('folio_draft_content', canvasEl.innerHTML);
+    }
+}
+
+titleEl.addEventListener('input', saveDraft);
+authorEl.addEventListener('input', saveDraft);
+
+window.onload = () => {
+    if (window.location.pathname === '/') {
+        titleEl.value = localStorage.getItem('folio_draft_title') || '';
+        authorEl.value = localStorage.getItem('folio_draft_author') || '';
+        canvasEl.innerHTML = localStorage.getItem('folio_draft_content') || '<p><br></p>';
+    } else {
+        // Init editor on edit page
+        if (!canvasEl.innerHTML.trim()) canvasEl.innerHTML = '<p><br></p>';
+    }
+    updatePlaceholder();
+};
+
+publishBtn.addEventListener('click', async () => {
+    const html = canvasEl.innerHTML;
+    const isEdit = window.location.pathname.startsWith('/edit/');
+    const url = isEdit ? '/api/articles/' + window.location.pathname.split('/').pop() : '/api/articles';
+    const method = isEdit ? 'PUT' : 'POST';
+
+    const res = await fetch(url, {
+        method: method,
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: new URLSearchParams({
+            title: titleEl.value,
+            author: authorEl.value,
+            contentHTML: html
+        })
+    });
+    
+    if (res.ok) {
+        const data = await res.json();
+        localStorage.removeItem('folio_draft_title');
+        localStorage.removeItem('folio_draft_author');
+        localStorage.removeItem('folio_draft_content');
+        window.location.href = '/' + data.slug;
+    } else {
+        alert("Failed to publish");
+    }
+});
