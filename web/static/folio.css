@@ -292,7 +292,7 @@ body {
     text-align: center;
 }
 @keyframes folioFadeIn {
-    from { opacity: 0; transform: translateY(5px); }
+    from { opacity: 0; transform: translateY(3px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
@@ -305,7 +305,7 @@ body {
     transition: box-shadow 0.2s ease;
 }
 .folio-canvas figure img.loaded, .folio-canvas img.loaded {
-    animation: folioFadeIn 0.5s ease-out forwards;
+    animation: folioFadeIn 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 .folio-canvas[contenteditable="true"] figure.focus img {
     box-shadow: 0 0 0 3px var(--accent);
@@ -421,7 +421,6 @@ body {
     border-radius: 12px;
     text-align: center;
     border: 1px solid rgba(128, 128, 128, 0.15);
-    box-shadow: 0 16px 40px var(--shadow);
     transform: scale(0.9);
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     font-family: var(--ui-font);
