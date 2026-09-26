@@ -65,7 +65,7 @@
     <div id="linkTooltip" class="folio-link-tooltip"></div>
 
     {{if .CanEdit}}
-    <div id="deleteModal" class="folio-modal-overlay">
+    <div id="deleteModal" class="folio-modal-overlay" onclick="if(event.target === this) hideConfirmModal()">
         <div class="folio-modal">
             <p style="margin: 0 0 20px 0; font-size: 16px; font-weight: 500;">Delete this article forever?</p>
             <div style="display: flex; gap: 12px; justify-content: center;">

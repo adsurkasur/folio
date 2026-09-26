@@ -420,7 +420,7 @@ body {
     padding: var(--space-5) var(--space-6); /* 32px 40px */
     border-radius: 12px;
     text-align: center;
-    border: 1px solid rgba(128, 128, 128, 0.15);
+    border: none;
     transform: scale(0.9);
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     font-family: var(--ui-font);
