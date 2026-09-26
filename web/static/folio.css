@@ -73,6 +73,12 @@ body {
     flex-shrink: 0;
     position: relative;
 }
+.author-actions .folio-btn {
+    min-width: 90px;
+    height: 36px;
+    padding: 0 var(--space-3);
+    text-align: center;
+}
 .folio-input-group {
     position: relative;
 }
@@ -397,12 +403,12 @@ body {
     .folio-container {
         padding: var(--space-6) var(--space-4) var(--space-9); /* 40px 24px 80px */
     }
-    .folio-actions {
+    .author-actions {
         flex-direction: column;
         align-items: stretch;
         gap: 6px;
     }
-    .folio-actions .folio-btn {
+    .author-actions .folio-btn {
         min-width: 76px;
         height: 30px;
         padding: 0 12px;
