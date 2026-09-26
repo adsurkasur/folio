@@ -15,6 +15,7 @@ import (
 	_ "image/png"
 	_ "golang.org/x/image/webp"
 	"io"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
@@ -518,7 +519,8 @@ func main() {
 	mux.HandleFunc("PUT /api/articles/{slug}", handleUpdate)
 	mux.HandleFunc("DELETE /api/articles/{slug}", handleDelete)
 
-	mux.Handle("GET /static/", http.FileServerFS(webFS))
+	subFS, _ := fs.Sub(webFS, "web")
+	mux.Handle("GET /static/", http.FileServer(http.FS(subFS)))
 	mux.Handle("GET /uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir(uploads))))
 
 	log.Printf("Folio running on :%s\n", *port)
