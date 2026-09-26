@@ -48,7 +48,6 @@ body {
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 20px;
-    transition: all 0.3s ease;
 }
 .folio-inputs {
     flex-grow: 1;
@@ -58,7 +57,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    transition: all 0.3s ease;
+    position: relative; /* For absolute error positioning */
 }
 
 .folio-btn {
@@ -72,9 +71,10 @@ body {
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     font-weight: 500;
     letter-spacing: 0.5px;
+    outline: none;
 }
 
-.folio-btn:hover {
+.folio-btn:hover, .folio-btn:active {
     background-color: var(--accent);
     color: var(--bg-color);
     transform: translateY(-2px);
@@ -121,14 +121,19 @@ body {
 .folio-error {
     color: #ff4d4d;
     font-size: 13px;
-    margin-top: 8px;
-    text-align: right;
-    animation: fadeIn 0.3s ease;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 5px;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-5px); }
-    to { opacity: 1; transform: translateY(0); }
+.folio-error:not(:empty) {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 /* Floating Labels */
@@ -146,9 +151,7 @@ body {
     pointer-events: none;
 }
 
-.folio-title:focus ~ .folio-label.title-label,
 .folio-title:not(:placeholder-shown) ~ .folio-label.title-label,
-.folio-author:focus ~ .folio-label.author-label,
 .folio-author:not(:placeholder-shown) ~ .folio-label.author-label {
     opacity: 1;
     transform: translateX(0);
@@ -167,6 +170,15 @@ body {
 .folio-canvas p {
     margin: 0 0 15px 0;
     transition: all 0.2s ease;
+}
+.folio-canvas h1, .folio-canvas h2, .folio-canvas h3, .folio-canvas blockquote {
+    outline: none;
+}
+.folio-canvas blockquote {
+    border-left: 3px solid var(--accent);
+    padding-left: 15px;
+    margin-left: 0;
+    color: var(--text-muted);
 }
 
 .folio-canvas img {
@@ -212,9 +224,10 @@ body {
     cursor: pointer;
     color: var(--text-muted);
     transition: all 0.2s ease;
+    outline: none;
 }
 
-.folio-toolbar-btn:hover {
+.folio-toolbar-btn:hover, .folio-toolbar-btn:active {
     border-color: var(--text-color);
     color: var(--text-color);
     transform: scale(1.1);
@@ -228,7 +241,7 @@ body {
 }
 @media (max-width: 600px) {
     .folio-container {
-        padding: 40px 20px 100px; /* Extra bottom padding for FAB */
+        padding: 40px 20px 100px;
     }
     .folio-top-row {
         flex-direction: column;
@@ -248,18 +261,26 @@ body {
         animation: slideUpFab 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
     .folio-btn {
-        box-shadow: 0 4px 15px var(--shadow);
         background-color: var(--accent);
         color: var(--bg-color);
+        box-shadow: 0 4px 15px var(--shadow);
         padding: 12px 24px;
         font-size: 15px;
     }
-    .folio-error {
+    .folio-btn:hover, .folio-btn:active {
         background-color: var(--bg-color);
-        padding: 5px 10px;
+        color: var(--accent);
+    }
+    .folio-error {
+        position: absolute;
+        bottom: 100%;
+        right: 0;
+        background-color: var(--bg-color);
+        padding: 8px 12px;
         border-radius: 8px;
         box-shadow: 0 2px 10px var(--shadow);
         margin-bottom: 10px;
+        border: 1px solid var(--border);
     }
 }
 

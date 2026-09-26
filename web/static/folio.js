@@ -8,18 +8,16 @@ const btnCamera = document.getElementById('btnCamera');
 const btnEmbed = document.getElementById('btnEmbed');
 
 let currentActiveNode = null;
-let embedMode = null; // 'image' or 'embed'
+let embedMode = null;
 
-// Placeholder polyfill for contenteditable
 function updatePlaceholder() {
-    if (canvasEl.textContent.trim() === '' && canvasEl.children.length <= 1) {
+    if (canvasEl.textContent.trim() === '' && canvasEl.children.length <= 1 && !embedMode) {
         canvasEl.classList.add('empty');
     } else {
         canvasEl.classList.remove('empty');
     }
 }
 
-// Position Toolbar
 function updateToolbarPosition() {
     const sel = window.getSelection();
     if (!sel.rangeCount) return;
@@ -27,13 +25,11 @@ function updateToolbarPosition() {
     let node = sel.anchorNode;
     if (node.nodeType === 3) node = node.parentNode;
     
-    // Ensure we are inside canvas
     if (!canvasEl.contains(node)) {
         toolbar.classList.remove('active');
         return;
     }
 
-    // Show toolbar if node is a top-level empty paragraph/div
     if ((node === canvasEl || node.parentNode === canvasEl) && node.textContent.trim() === '') {
         const rect = node.getBoundingClientRect();
         const containerRect = document.querySelector('.folio-container').getBoundingClientRect();
@@ -43,23 +39,32 @@ function updateToolbarPosition() {
         currentActiveNode = node === canvasEl ? null : node;
     } else {
         toolbar.classList.remove('active');
-        embedMode = null;
+        if (embedMode && currentActiveNode) {
+            currentActiveNode.classList.remove('embed-placeholder');
+            embedMode = null;
+        }
     }
 }
 
 document.addEventListener('selectionchange', updateToolbarPosition);
+
 canvasEl.addEventListener('input', () => {
+    if (embedMode && currentActiveNode && currentActiveNode.textContent.trim() !== '') {
+        currentActiveNode.classList.remove('embed-placeholder');
+        embedMode = null;
+    }
     updatePlaceholder();
     updateToolbarPosition();
     saveDraft();
 });
 
-// Toolbar Actions
 btnCamera.addEventListener('click', () => {
     embedMode = 'image';
     if(currentActiveNode) {
         currentActiveNode.setAttribute('data-placeholder', 'Paste a link to image or video and press Enter');
         currentActiveNode.classList.add('embed-placeholder');
+        canvasEl.classList.remove('empty');
+        currentActiveNode.focus();
     }
 });
 
@@ -68,10 +73,11 @@ btnEmbed.addEventListener('click', () => {
     if(currentActiveNode) {
         currentActiveNode.setAttribute('data-placeholder', 'Paste a YouTube, Vimeo or Twitter link, and press Enter');
         currentActiveNode.classList.add('embed-placeholder');
+        canvasEl.classList.remove('empty');
+        currentActiveNode.focus();
     }
 });
 
-// Handle URL Enter for fetching
 canvasEl.addEventListener('keydown', async (e) => {
     if (e.key === 'Enter') {
         const sel = window.getSelection();
@@ -113,7 +119,6 @@ canvasEl.addEventListener('keydown', async (e) => {
             embedMode = null;
             node.classList.remove('embed-placeholder');
         } else {
-            // Remove placeholder styling on normal enter
             if (node.classList && node.classList.contains('embed-placeholder')) {
                 node.classList.remove('embed-placeholder');
                 embedMode = null;
@@ -122,7 +127,6 @@ canvasEl.addEventListener('keydown', async (e) => {
     }
 });
 
-// Auto-format markdown headers
 canvasEl.addEventListener('input', (e) => {
     const sel = window.getSelection();
     if (!sel.anchorNode) return;
@@ -131,15 +135,23 @@ canvasEl.addEventListener('input', (e) => {
     
     if (node.tagName === 'P' || node.tagName === 'DIV') {
         const text = node.textContent;
+        let newHtml = null;
         if (text.startsWith('# ')) {
-            node.outerHTML = '<h1>' + text.substring(2) + '</h1>';
-            placeCaretAtEnd(canvasEl);
+            newHtml = '<h1>' + text.substring(2) + '</h1>';
         } else if (text.startsWith('## ')) {
-            node.outerHTML = '<h2>' + text.substring(3) + '</h2>';
-            placeCaretAtEnd(canvasEl);
+            newHtml = '<h2>' + text.substring(3) + '</h2>';
+        } else if (text.startsWith('### ')) {
+            newHtml = '<h3>' + text.substring(4) + '</h3>';
         } else if (text.startsWith('> ')) {
-            node.outerHTML = '<blockquote>' + text.substring(2) + '</blockquote>';
-            placeCaretAtEnd(canvasEl);
+            newHtml = '<blockquote>' + text.substring(2) + '</blockquote>';
+        }
+        
+        if (newHtml) {
+            const temp = document.createElement('div');
+            temp.innerHTML = newHtml;
+            const newEl = temp.firstChild;
+            node.parentNode.replaceChild(newEl, node);
+            placeCaretAtEnd(newEl);
         }
     }
 });
@@ -156,7 +168,6 @@ function placeCaretAtEnd(el) {
     }
 }
 
-// Save & Publish
 function saveDraft() {
     if (window.location.pathname === '/') {
         localStorage.setItem('folio_draft_title', titleEl.value);
@@ -178,7 +189,6 @@ window.onload = () => {
         authorEl.value = localStorage.getItem('folio_draft_author') || '';
         canvasEl.innerHTML = localStorage.getItem('folio_draft_content') || '<p><br></p>';
     } else {
-        // Init editor on edit page
         if (!canvasEl.innerHTML.trim()) canvasEl.innerHTML = '<p><br></p>';
     }
     updatePlaceholder();
