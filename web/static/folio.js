@@ -1,4 +1,4 @@
-﻿const titleEl = document.getElementById('title');
+const titleEl = document.getElementById('title');
 const authorEl = document.getElementById('author');
 const canvasEl = document.getElementById('canvas');
 const publishBtn = document.getElementById('publishBtn');
@@ -127,6 +127,28 @@ canvasEl.addEventListener('keydown', async (e) => {
     }
 });
 
+function transformBlock(node, tag, text) {
+    const el = document.createElement(tag);
+    if (!text || text.trim() === '') {
+        el.innerHTML = '<br>';
+    } else {
+        el.textContent = text;
+    }
+    node.parentNode.replaceChild(el, node);
+    el.focus();
+    const range = document.createRange();
+    const sel = window.getSelection();
+    if (el.firstChild && el.firstChild.nodeType === 3) {
+        range.setStart(el.firstChild, el.firstChild.length);
+        range.collapse(true);
+    } else {
+        range.setStart(el, 0);
+        range.collapse(true);
+    }
+    sel.removeAllRanges();
+    sel.addRange(range);
+}
+
 canvasEl.addEventListener('input', (e) => {
     const sel = window.getSelection();
     if (!sel.anchorNode) return;
@@ -135,23 +157,14 @@ canvasEl.addEventListener('input', (e) => {
     
     if (node.tagName === 'P' || node.tagName === 'DIV') {
         const text = node.textContent;
-        let newHtml = null;
-        if (text.startsWith('# ')) {
-            newHtml = '<h1>' + text.substring(2) + '</h1>';
+        if (text.startsWith('### ')) {
+            transformBlock(node, 'h3', text.substring(4));
         } else if (text.startsWith('## ')) {
-            newHtml = '<h2>' + text.substring(3) + '</h2>';
-        } else if (text.startsWith('### ')) {
-            newHtml = '<h3>' + text.substring(4) + '</h3>';
+            transformBlock(node, 'h2', text.substring(3));
+        } else if (text.startsWith('# ')) {
+            transformBlock(node, 'h1', text.substring(2));
         } else if (text.startsWith('> ')) {
-            newHtml = '<blockquote>' + text.substring(2) + '</blockquote>';
-        }
-        
-        if (newHtml) {
-            const temp = document.createElement('div');
-            temp.innerHTML = newHtml;
-            const newEl = temp.firstChild;
-            node.parentNode.replaceChild(newEl, node);
-            placeCaretAtEnd(newEl);
+            transformBlock(node, 'blockquote', text.substring(2));
         }
     }
 });
@@ -224,6 +237,7 @@ publishBtn.addEventListener('click', async () => {
         localStorage.removeItem('folio_draft_content');
         window.location.href = '/' + data.slug;
     } else {
-        errorMsg.textContent = 'Failed to publish';
+        const errText = await res.text();
+        errorMsg.textContent = errText || 'Failed to publish';
     }
 });

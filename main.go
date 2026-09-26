@@ -266,24 +266,37 @@ func handlePublish(w http.ResponseWriter, r *http.Request) {
 		ogImage = strings.Replace(match[1], "img_", "thumb_", 1)
 	}
 
+	var tokenVal string
 	cookie, err := r.Cookie("folio_author_token")
-	if err != nil {
-		http.Error(w, "Missing auth cookie", http.StatusUnauthorized)
-		return
+	if err != nil || cookie == nil || cookie.Value == "" {
+		tokenVal = randHex(16)
+		http.SetCookie(w, &http.Cookie{
+			Name:     "folio_author_token",
+			Value:    tokenVal,
+			Path:     "/",
+			HttpOnly: true,
+			SameSite: http.SameSiteLaxMode,
+			MaxAge:   315360000,
+		})
+	} else {
+		tokenVal = cookie.Value
 	}
-	tokenHash := hashToken(cookie.Value)
+	tokenHash := hashToken(tokenVal)
 	slug := generateSlug(req.Title)
+
+	log.Printf("[Publish] Title: %q by %q, slug: %s", req.Title, req.AuthorName, slug)
 
 	_, err = db.Exec("INSERT INTO articles (slug, title, author_name, content_html, content_text, og_image_url, author_token_hash) VALUES (?, ?, ?, ?, ?, ?, ?)",
 		slug, req.Title, req.AuthorName, cleanHTML, plainText, ogImage, tokenHash)
 	if err != nil {
+		log.Printf("[Publish ERROR] DB Insert failed: %v", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"slug":       slug,
-		"edit_token": cookie.Value, // Provide backup token
+		"edit_token": tokenVal,
 	})
 }
 

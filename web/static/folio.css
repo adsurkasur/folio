@@ -248,52 +248,25 @@ body {
 }
 @media (max-width: 600px) {
     .folio-container {
-        padding: 40px 20px 100px;
+        padding: 40px 20px 60px;
     }
     .folio-top-row {
         flex-direction: column;
+        margin-bottom: 10px;
     }
     .folio-inputs {
         padding-right: 0;
         width: 100%;
     }
-    
-    /* FAB Styling for Publish Button */
     .folio-actions {
-        position: fixed;
-        bottom: 30px;
-        right: 20px;
-        z-index: 1000;
-        align-items: flex-end;
-        animation: slideUpFab 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
-    }
-    .folio-btn {
-        box-shadow: 0 4px 15px var(--shadow);
-        padding: 12px 24px;
-        font-size: 15px;
-        /* Keep identical colors to desktop (white on black in dark mode) */
-        background-color: var(--bg-color);
-        color: var(--accent);
-    }
-    .folio-btn:hover, .folio-btn:active {
-        /* Reverse on tap/hover */
-        background-color: var(--accent);
-        color: var(--bg-color);
+        margin-top: 14px;
+        margin-bottom: 18px;
+        align-items: flex-start;
+        position: relative;
     }
     .folio-error {
-        position: absolute;
-        bottom: 100%;
-        right: 0;
-        background-color: var(--bg-color);
-        padding: 8px 12px;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px var(--shadow);
-        margin-bottom: 10px;
-        border: 1px solid var(--border);
+        right: auto;
+        left: 0;
+        top: 100%;
     }
-}
-
-@keyframes slideUpFab {
-    from { transform: translateY(100px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
 }
