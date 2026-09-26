@@ -307,12 +307,12 @@ body {
     outline: none;
     min-height: 20px;
 }
-.folio-canvas[contenteditable="true"] figcaption:empty::before,
-.folio-canvas figcaption[contenteditable="true"]:empty::before {
+.folio-canvas figcaption[contenteditable="true"].empty::before {
     content: attr(data-placeholder);
     color: var(--text-muted);
     cursor: text;
     pointer-events: none;
+    display: inline-block;
 }
 
 .folio-author-name[contenteditable="true"]:empty::before {

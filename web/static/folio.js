@@ -32,6 +32,16 @@ function updatePlaceholder() {
     } else {
         canvasEl.classList.remove('empty');
     }
+
+    // Toggle empty class on figcaptions
+    const figcaptions = canvasEl.querySelectorAll('figcaption');
+    figcaptions.forEach(fc => {
+        if (fc.textContent.trim() === '') {
+            fc.classList.add('empty');
+        } else {
+            fc.classList.remove('empty');
+        }
+    });
 }
 
 function getActiveBlock(node) {
@@ -261,6 +271,9 @@ document.addEventListener('selectionchange', () => {
 // Image / Figure insertion helper
 function insertFigureWithImage(targetEl, src) {
     const figure = document.createElement('figure');
+    figure.contentEditable = 'false';
+    figure.tabIndex = -1; // make it focusable/selectable
+
     const img = document.createElement('img');
     img.src = src;
     figure.appendChild(img);
@@ -268,6 +281,7 @@ function insertFigureWithImage(targetEl, src) {
     const figcaption = document.createElement('figcaption');
     figcaption.contentEditable = 'true';
     figcaption.setAttribute('data-placeholder', 'Caption (optional)');
+    figcaption.className = 'empty';
     figure.appendChild(figcaption);
 
     if (targetEl && targetEl.parentNode) {
@@ -276,11 +290,15 @@ function insertFigureWithImage(targetEl, src) {
         canvasEl.appendChild(figure);
     }
 
-    const p = document.createElement('p');
-    p.innerHTML = '<br>';
-    figure.parentNode.insertBefore(p, figure.nextSibling);
+    let nextP = figure.nextElementSibling;
+    if (!nextP || nextP.tagName !== 'P') {
+        nextP = document.createElement('p');
+        nextP.innerHTML = '<br>';
+        figure.parentNode.insertBefore(nextP, figure.nextSibling);
+    }
 
-    setCaret(p, 0);
+    // Auto focus the figcaption
+    figcaption.focus();
     updatePlaceholder();
 }
 
@@ -382,18 +400,42 @@ if (canvasEl) {
 
         // Enter key in figcaption: move caret to trailing paragraph
         if (e.key === 'Enter' && node && (node.tagName === 'FIGCAPTION' || node.closest('figcaption'))) {
-            e.preventDefault();
-            const fig = (node.tagName === 'FIGCAPTION' ? node : node.closest('figcaption')).closest('figure');
-            if (fig) {
-                let nextP = fig.nextElementSibling;
-                if (!nextP || nextP.tagName !== 'P') {
-                    nextP = document.createElement('p');
-                    nextP.innerHTML = '<br>';
-                    fig.parentNode.insertBefore(nextP, fig.nextSibling);
+            if (!e.shiftKey) {
+                e.preventDefault();
+                const fig = (node.tagName === 'FIGCAPTION' ? node : node.closest('figcaption')).closest('figure');
+                if (fig) {
+                    let nextP = fig.nextElementSibling;
+                    if (!nextP || nextP.tagName !== 'P') {
+                        nextP = document.createElement('p');
+                        nextP.innerHTML = '<br>';
+                        fig.parentNode.insertBefore(nextP, fig.nextSibling);
+                    }
+                    setCaret(nextP, 0);
                 }
-                setCaret(nextP, 0);
+                return;
             }
-            return;
+        }
+
+        // Backspace inside empty figcaption deletes the figure
+        if (e.key === 'Backspace' && node && (node.tagName === 'FIGCAPTION' || node.closest('figcaption'))) {
+            const figCap = node.tagName === 'FIGCAPTION' ? node : node.closest('figcaption');
+            if (figCap.textContent.trim() === '') {
+                e.preventDefault();
+                const fig = figCap.closest('figure');
+                if (fig) {
+                    let prev = fig.previousElementSibling;
+                    if (!prev) {
+                        prev = document.createElement('p');
+                        prev.innerHTML = '<br>';
+                        fig.parentNode.insertBefore(prev, fig);
+                    }
+                    fig.parentNode.removeChild(fig);
+                    const target = prev.lastChild || prev;
+                    setCaret(target, target.textContent.length || 0);
+                    updatePlaceholder();
+                }
+                return;
+            }
         }
 
         // Enter key handling
@@ -724,10 +766,17 @@ if (editBtn) {
         }
         canvasEl.contentEditable = 'true';
         
+        // Setup figures for editing
+        canvasEl.querySelectorAll('figure').forEach(fig => {
+            fig.contentEditable = 'false';
+            fig.tabIndex = -1;
+        });
+
         // Make existing figcaptions editable
         canvasEl.querySelectorAll('figcaption').forEach(fc => {
             fc.contentEditable = 'true';
             fc.setAttribute('data-placeholder', 'Caption (optional)');
+            if (fc.textContent.trim() === '') fc.classList.add('empty');
         });
 
         editBtn.textContent = 'SAVE';

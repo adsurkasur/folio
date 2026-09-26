@@ -1,4 +1,4 @@
-﻿package main
+package main
 
 import (
 	"crypto/rand"
@@ -505,7 +505,7 @@ func main() {
 	policy = bluemonday.UGCPolicy()
 	policy.AllowElements("iframe", "figure", "figcaption")
 	policy.AllowAttrs("src", "width", "height", "frameborder", "allowfullscreen").OnElements("iframe")
-	policy.AllowAttrs("data-placeholder", "contenteditable").OnElements("figcaption")
+	policy.AllowAttrs("data-placeholder", "class").OnElements("figcaption")
 
 	tmpl = template.Must(template.ParseFS(webFS, "web/templates/*.html"))
 
