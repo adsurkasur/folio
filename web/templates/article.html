@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Article.Title}} - Folio</title>
+    
+    <!-- Open Graph Universal -->
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="Folio">
+    <meta property="og:title" content="{{.Article.Title}}">
+    <meta property="og:description" content="{{.Article.ContentText}}">
+    <meta property="og:url" content="{{.BaseURL}}/{{.Article.Slug}}">
+    
+    {{if .Article.OGImageURL}}
+    <meta property="og:image" content="{{.BaseURL}}{{.Article.OGImageURL}}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="{{.BaseURL}}{{.Article.OGImageURL}}">
+    {{end}}
+
+    <link rel="stylesheet" href="/static/folio.css">
+</head>
+<body>
+    <div class="folio-container">
+        <header class="folio-header">
+            <a href="/" class="folio-logo">Folio</a>
+            <div>
+                {{if .CanEdit}}
+                <a href="/{{.Article.Slug}}/edit" class="folio-btn">Edit</a>
+                <button id="deleteBtn" class="folio-btn danger" data-slug="{{.Article.Slug}}">Delete</button>
+                {{end}}
+            </div>
+        </header>
+
+        <main>
+            <h1 class="folio-title" style="margin-bottom: 5px;">{{.Article.Title}}</h1>
+            <div class="folio-meta">
+                <span>{{if .Article.AuthorName}}{{.Article.AuthorName}}{{else}}Anonymous{{end}} • {{.Article.CreatedAt.Format "Jan 02, 2006"}}</span>
+                <span>👁 {{.Article.ViewsCount}}</span>
+            </div>
+            
+            <article class="folio-canvas">
+                {{.Article.ContentHTML}}
+            </article>
+        </main>
+    </div>
+    <script src="/static/folio.js"></script>
+</body>
+</html>

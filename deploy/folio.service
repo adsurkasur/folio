@@ -1,0 +1,16 @@
+[Unit]
+Description=Folio Minimalist Publishing Platform
+After=network.target
+
+[Service]
+Type=simple
+User=adsur
+Group=adsur
+WorkingDirectory=/srv/hdd1/folio
+ExecStart=/srv/hdd1/folio/folio -port 8085
+Restart=on-failure
+RestartSec=5
+Environment=BASE_URL=https://folio.arinahub.com
+
+[Install]
+WantedBy=multi-user.target
