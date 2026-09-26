@@ -24,6 +24,7 @@ jobs:
 
       - name: Build Binaries
         run: |
+          go mod tidy
           mkdir -p dist
           # Build with flags to shrink binary size (-s -w removes debug symbols)
           GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o dist/folio-linux-amd64 main.go
