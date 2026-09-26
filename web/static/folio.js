@@ -25,6 +25,29 @@ function setCaret(node, offset = 0) {
     sel.addRange(range);
 }
 
+function scrollCaretIntoView() {
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+    let rect = range.getBoundingClientRect();
+    if (rect.height === 0 || rect.width === 0) {
+        const node = sel.anchorNode;
+        if (node && node.nodeType === 1) {
+            rect = node.getBoundingClientRect();
+        } else if (node && node.parentElement) {
+            rect = node.parentElement.getBoundingClientRect();
+        }
+    }
+    if (rect) {
+        // Add an 80px buffer so we don't scroll exactly to the edge
+        if (rect.bottom > window.innerHeight - 80) {
+            window.scrollBy({ top: rect.bottom - (window.innerHeight - 80), behavior: 'auto' });
+        } else if (rect.top < 80) {
+            window.scrollBy({ top: rect.top - 80, behavior: 'auto' });
+        }
+    }
+}
+
 function updatePlaceholder() {
     if (!canvasEl) return;
     if (canvasEl.textContent.trim() === '' && canvasEl.children.length <= 1 && !embedMode) {
@@ -274,6 +297,10 @@ document.addEventListener('selectionchange', () => {
         if (node && !node.closest('figure')) {
             document.querySelectorAll('figure.focus').forEach(fig => fig.classList.remove('focus'));
         }
+    }
+
+    if (isArticleEditing || window.location.pathname === '/') {
+        scrollCaretIntoView();
     }
 });
 
