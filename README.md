@@ -2,7 +2,7 @@
   <img src="assets/logo.svg" alt="Folio Logo" width="100" />
   <h1>Folio</h1>
   <p>A minimalist, zero-dependency self-hosted publishing platform inspired by <strong><a href="https://telegra.ph">Telegra.ph</a></strong>.</p>
-  <p><a href="https://folio.arinahub.com"><strong>folio.arinahub.com</strong></a></p>
+  <p><a href="https://folio.arinahub.com"><strong>folio.arinahub.com</strong></a> &middot; <a href="https://folio.arinahub.com/privacy">Privacy</a> &middot; <a href="https://folio.arinahub.com/terms">Terms</a></p>
 
   [![Go Version](https://img.shields.io/github/go-mod/go-version/adsurkasur/folio?style=for-the-badge&color=00ADD8)](https://github.com/adsurkasur/folio/blob/master/go.mod)
   [![License](https://img.shields.io/github/license/adsurkasur/folio?style=for-the-badge)](https://github.com/adsurkasur/folio/blob/master/LICENSE)
