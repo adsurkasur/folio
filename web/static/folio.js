@@ -297,9 +297,9 @@ document.addEventListener('click', (e) => {
 
 document.addEventListener('keydown', (e) => {
     if (!isArticleEditing && window.location.pathname !== '/') return;
-    if (e.key === 'Backspace' || e.key === 'Delete') {
-        const focusedFigure = document.querySelector('figure.focus');
-        if (focusedFigure) {
+    const focusedFigure = document.querySelector('figure.focus');
+    if (focusedFigure) {
+        if (e.key === 'Backspace' || e.key === 'Delete') {
             e.preventDefault();
             let prev = focusedFigure.previousElementSibling;
             if (!prev) {
@@ -311,6 +311,22 @@ document.addEventListener('keydown', (e) => {
             const target = prev.lastChild || prev;
             setCaret(target, target.textContent ? target.textContent.length : 0);
             updatePlaceholder();
+        } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+            e.preventDefault();
+            focusedFigure.classList.remove('focus');
+            let prev = focusedFigure.previousElementSibling;
+            if (prev) {
+                const target = prev.lastChild && prev.lastChild.nodeType === 3 ? prev.lastChild : prev;
+                setCaret(target, target.textContent ? target.textContent.length : 0);
+            }
+        } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+            e.preventDefault();
+            focusedFigure.classList.remove('focus');
+            let caption = focusedFigure.querySelector('figcaption');
+            if (caption) {
+                caption.focus();
+                setCaret(caption, 0);
+            }
         }
     }
 });
@@ -441,6 +457,21 @@ if (canvasEl) {
     canvasEl.addEventListener('keydown', async (e) => {
         const sel = window.getSelection();
         if (!sel.rangeCount) return;
+        
+        // Let native browser handle selections (e.g. Ctrl+A -> Backspace)
+        if (!sel.isCollapsed && (e.key === 'Backspace' || e.key === 'Delete' || e.key === 'Enter')) {
+            if (e.key === 'Backspace' || e.key === 'Delete') {
+                setTimeout(() => {
+                    if (canvasEl.innerHTML.trim() === '' || canvasEl.innerHTML === '<br>') {
+                        canvasEl.innerHTML = '<p><br></p>';
+                        setCaret(canvasEl.firstElementChild, 0);
+                    }
+                    updatePlaceholder();
+                }, 10);
+            }
+            return;
+        }
+
         let node = sel.anchorNode;
         if (node && node.nodeType === 3) node = node.parentNode;
         const block = getActiveBlock(node);
