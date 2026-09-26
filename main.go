@@ -380,7 +380,7 @@ func handleUpload(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	img, _, err := image.Decode(file)
+	_, _, err = image.Decode(file)
 	if err != nil {
 		http.Error(w, "Invalid image", http.StatusBadRequest)
 		return
