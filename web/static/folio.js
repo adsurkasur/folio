@@ -48,19 +48,17 @@ function updateToolbarPosition() {
 
 document.addEventListener('selectionchange', updateToolbarPosition);
 
-canvasEl.addEventListener('input', () => {
-    if (embedMode && currentActiveNode && currentActiveNode.textContent.trim() !== '') {
-        currentActiveNode.classList.remove('embed-placeholder');
-        embedMode = null;
+function getActiveBlock(node) {
+    let block = node;
+    while (block && block.parentNode !== canvasEl && block !== canvasEl) {
+        block = block.parentNode;
     }
-    updatePlaceholder();
-    updateToolbarPosition();
-    saveDraft();
-});
+    return (block && block !== canvasEl) ? block : null;
+}
 
 btnCamera.addEventListener('click', () => {
     embedMode = 'image';
-    if(currentActiveNode) {
+    if (currentActiveNode) {
         currentActiveNode.setAttribute('data-placeholder', 'Paste a link to image or video and press Enter');
         currentActiveNode.classList.add('embed-placeholder');
         canvasEl.classList.remove('empty');
@@ -70,7 +68,7 @@ btnCamera.addEventListener('click', () => {
 
 btnEmbed.addEventListener('click', () => {
     embedMode = 'embed';
-    if(currentActiveNode) {
+    if (currentActiveNode) {
         currentActiveNode.setAttribute('data-placeholder', 'Paste a YouTube, Vimeo or Twitter link, and press Enter');
         currentActiveNode.classList.add('embed-placeholder');
         canvasEl.classList.remove('empty');
@@ -78,12 +76,17 @@ btnEmbed.addEventListener('click', () => {
     }
 });
 
+// Keydown handler: enter & backspace block escape & embed fetch
 canvasEl.addEventListener('keydown', async (e) => {
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+    let node = sel.anchorNode;
+    if (node.nodeType === 3) node = node.parentNode;
+    const block = getActiveBlock(node);
+
+    // Enter key handling
     if (e.key === 'Enter') {
-        const sel = window.getSelection();
-        let node = sel.anchorNode;
-        if (node.nodeType === 3) node = node.parentNode;
-        
+        // Embed URL submission
         if (embedMode && node.textContent.trim().startsWith('http')) {
             e.preventDefault();
             const url = node.textContent.trim();
@@ -95,7 +98,7 @@ canvasEl.addEventListener('keydown', async (e) => {
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ url, type: embedMode })
                 });
-                if(!res.ok) throw new Error('Fetch failed');
+                if (!res.ok) throw new Error('Fetch failed');
                 const data = await res.json();
                 
                 node.innerHTML = '';
@@ -111,17 +114,79 @@ canvasEl.addEventListener('keydown', async (e) => {
                 range.setStart(p, 0);
                 sel.removeAllRanges();
                 sel.addRange(range);
-                
             } catch (err) {
                 node.textContent = '';
                 alert('Gagal mengambil gambar/link.');
             }
             embedMode = null;
             node.classList.remove('embed-placeholder');
-        } else {
-            if (node.classList && node.classList.contains('embed-placeholder')) {
-                node.classList.remove('embed-placeholder');
-                embedMode = null;
+            return;
+        }
+
+        // Exit blockquote / heading on Enter if empty
+        if (block && !e.shiftKey) {
+            const tag = block.tagName;
+            const text = block.textContent.replace(/\u200B/g, '').trim();
+
+            if (['BLOCKQUOTE', 'H1', 'H2', 'H3', 'PRE'].includes(tag)) {
+                if (text === '') {
+                    e.preventDefault();
+                    const p = document.createElement('p');
+                    p.innerHTML = '<br>';
+                    block.parentNode.replaceChild(p, block);
+
+                    const range = document.createRange();
+                    range.setStart(p, 0);
+                    range.collapse(true);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                    return;
+                }
+                
+                // If in H1/H2/H3 and at end of text, Enter creates a normal paragraph below
+                if (['H1', 'H2', 'H3'].includes(tag)) {
+                    if (sel.anchorNode && (sel.anchorOffset === sel.anchorNode.textContent.length || sel.anchorNode === block)) {
+                        e.preventDefault();
+                        const p = document.createElement('p');
+                        p.innerHTML = '<br>';
+                        if (block.nextSibling) {
+                            canvasEl.insertBefore(p, block.nextSibling);
+                        } else {
+                            canvasEl.appendChild(p);
+                        }
+                        const range = document.createRange();
+                        range.setStart(p, 0);
+                        range.collapse(true);
+                        sel.removeAllRanges();
+                        sel.addRange(range);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    // Backspace handling: escape blockquote, heading, pre when empty
+    if (e.key === 'Backspace' && block) {
+        const tag = block.tagName;
+        if (['BLOCKQUOTE', 'H1', 'H2', 'H3', 'PRE'].includes(tag)) {
+            const text = block.textContent.replace(/\u200B/g, '').trim();
+            if (text === '' || (sel.anchorOffset === 0 && (sel.anchorNode === block || sel.anchorNode === block.firstChild))) {
+                e.preventDefault();
+                const p = document.createElement('p');
+                p.innerHTML = text ? text : '<br>';
+                block.parentNode.replaceChild(p, block);
+
+                const range = document.createRange();
+                if (text && p.firstChild) {
+                    range.setStart(p.firstChild, 0);
+                } else {
+                    range.setStart(p, 0);
+                }
+                range.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(range);
+                return;
             }
         }
     }
@@ -149,37 +214,175 @@ function transformBlock(node, tag, text) {
     sel.addRange(range);
 }
 
+// Markdown input formatting
 canvasEl.addEventListener('input', (e) => {
+    if (embedMode && currentActiveNode && currentActiveNode.textContent.trim() !== '') {
+        currentActiveNode.classList.remove('embed-placeholder');
+        embedMode = null;
+    }
+    updatePlaceholder();
+    updateToolbarPosition();
+    saveDraft();
+
     const sel = window.getSelection();
-    if (!sel.anchorNode) return;
+    if (!sel.rangeCount || !sel.anchorNode) return;
     let node = sel.anchorNode;
-    if (node.nodeType === 3) node = node.parentNode;
-    
-    if (node.tagName === 'P' || node.tagName === 'DIV') {
-        const text = node.textContent;
+    let parentBlock = node;
+    if (parentBlock.nodeType === 3) parentBlock = parentBlock.parentNode;
+
+    // Check inline markdown (code, bold, italic) on text nodes
+    if (node.nodeType === 3) {
+        const text = node.nodeValue;
+
+        // Inline code `code `
+        const codeMatch = text.match(/`([^`]+)`(\s?)/);
+        if (codeMatch) {
+            const start = codeMatch.index;
+            const fullLen = codeMatch[0].length;
+            const codeContent = codeMatch[1];
+            const space = codeMatch[2] || '';
+
+            const before = text.substring(0, start);
+            const after = text.substring(start + fullLen);
+
+            const p = node.parentNode;
+            const codeEl = document.createElement('code');
+            codeEl.textContent = codeContent;
+
+            const frag = document.createDocumentFragment();
+            if (before) frag.appendChild(document.createTextNode(before));
+            frag.appendChild(codeEl);
+            const afterNode = document.createTextNode(space ? '\u00A0' : '');
+            frag.appendChild(afterNode);
+
+            p.replaceChild(frag, node);
+
+            const range = document.createRange();
+            range.setStart(afterNode, afterNode.length);
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+            return;
+        }
+
+        // Bold **text** 
+        const boldMatch = text.match(/\*\*([^*]+)\*\*(\s?)/);
+        if (boldMatch) {
+            const start = boldMatch.index;
+            const fullLen = boldMatch[0].length;
+            const boldContent = boldMatch[1];
+            const space = boldMatch[2] || '';
+
+            const before = text.substring(0, start);
+            const after = text.substring(start + fullLen);
+
+            const p = node.parentNode;
+            const bEl = document.createElement('b');
+            bEl.textContent = boldContent;
+
+            const frag = document.createDocumentFragment();
+            if (before) frag.appendChild(document.createTextNode(before));
+            frag.appendChild(bEl);
+            const afterNode = document.createTextNode(space ? '\u00A0' : '');
+            frag.appendChild(afterNode);
+
+            p.replaceChild(frag, node);
+
+            const range = document.createRange();
+            range.setStart(afterNode, afterNode.length);
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+            return;
+        }
+    }
+
+    // Block markdown conversion
+    if (parentBlock.tagName === 'P' || parentBlock.tagName === 'DIV') {
+        const text = parentBlock.textContent;
+
+        // Code block ```
+        if (text.startsWith('```')) {
+            const pre = document.createElement('pre');
+            const code = document.createElement('code');
+            code.innerHTML = '<br>';
+            pre.appendChild(code);
+            parentBlock.parentNode.replaceChild(pre, parentBlock);
+            const range = document.createRange();
+            range.setStart(code, 0);
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+            return;
+        }
+
+        // Bullet lists
+        if (text.startsWith('- ') || text.startsWith('* ')) {
+            const ul = document.createElement('ul');
+            const li = document.createElement('li');
+            const rem = text.substring(2);
+            li.innerHTML = rem.trim() ? rem : '<br>';
+            ul.appendChild(li);
+            parentBlock.parentNode.replaceChild(ul, parentBlock);
+            const range = document.createRange();
+            if (rem.trim() && li.firstChild) {
+                range.setStart(li.firstChild, rem.length);
+            } else {
+                range.setStart(li, 0);
+            }
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+            return;
+        }
+
+        // Numbered lists
+        if (text.startsWith('1. ')) {
+            const ol = document.createElement('ol');
+            const li = document.createElement('li');
+            const rem = text.substring(3);
+            li.innerHTML = rem.trim() ? rem : '<br>';
+            ol.appendChild(li);
+            parentBlock.parentNode.replaceChild(ol, parentBlock);
+            const range = document.createRange();
+            if (rem.trim() && li.firstChild) {
+                range.setStart(li.firstChild, rem.length);
+            } else {
+                range.setStart(li, 0);
+            }
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+            return;
+        }
+
+        // Horizontal rule
+        if (text === '---') {
+            const hr = document.createElement('hr');
+            const p = document.createElement('p');
+            p.innerHTML = '<br>';
+            parentBlock.parentNode.replaceChild(hr, parentBlock);
+            hr.parentNode.insertBefore(p, hr.nextSibling);
+            const range = document.createRange();
+            range.setStart(p, 0);
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+            return;
+        }
+
+        // Headings & Quote
         if (text.startsWith('### ')) {
-            transformBlock(node, 'h3', text.substring(4));
+            transformBlock(parentBlock, 'h3', text.substring(4));
         } else if (text.startsWith('## ')) {
-            transformBlock(node, 'h2', text.substring(3));
+            transformBlock(parentBlock, 'h2', text.substring(3));
         } else if (text.startsWith('# ')) {
-            transformBlock(node, 'h1', text.substring(2));
+            transformBlock(parentBlock, 'h1', text.substring(2));
         } else if (text.startsWith('> ')) {
-            transformBlock(node, 'blockquote', text.substring(2));
+            transformBlock(parentBlock, 'blockquote', text.substring(2));
         }
     }
 });
-
-function placeCaretAtEnd(el) {
-    el.focus();
-    if (typeof window.getSelection != "undefined" && typeof document.createRange != "undefined") {
-        var range = document.createRange();
-        range.selectNodeContents(el);
-        range.collapse(false);
-        var sel = window.getSelection();
-        sel.removeAllRanges();
-        sel.addRange(range);
-    }
-}
 
 function saveDraft() {
     if (window.location.pathname === '/') {
