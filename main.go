@@ -511,7 +511,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /", handleHome)
 	mux.HandleFunc("GET /{slug}", handleArticle)
-	mux.HandleFunc("GET /edit/\{slug\}", handleEditPage)
+	mux.HandleFunc("GET /edit/{slug}", handleEditPage)
 	
 	mux.HandleFunc("POST /api/upload", handleUpload)
 	mux.HandleFunc("POST /api/articles", handlePublish)
