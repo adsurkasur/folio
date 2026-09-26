@@ -71,6 +71,7 @@ body {
     align-self: flex-start;
     flex-shrink: 0;
     position: relative;
+    margin-top: 4px;
 }
 .author-actions {
     display: flex;
@@ -180,20 +181,20 @@ body {
 .folio-label {
     position: absolute;
     left: -70px;
-    top: 10px;
+    top: 50%;
     color: var(--text-muted);
     font-size: 14px;
     text-align: right;
     width: 50px;
     opacity: 0;
-    transform: translateX(10px);
+    transform: translateY(-50%) translateX(10px);
     transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
     pointer-events: none;
 }
 .folio-title:not(:placeholder-shown) ~ .folio-label.title-label,
 .folio-author:not(:placeholder-shown) ~ .folio-label.author-label {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(-50%) translateX(0);
 }
 
 /* Content Canvas */
