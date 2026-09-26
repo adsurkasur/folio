@@ -1,4 +1,4 @@
-﻿:root {
+﻿﻿:root {
     --bg-color: #ffffff;
     --text-color: #1a1a1a;
     --text-muted: #b3b3b3;
@@ -21,7 +21,6 @@
 }
 
 body {
-    background-color: var(--bg-color);
     font-family: var(--content-font);
     
     color: var(--text-color);
@@ -62,7 +61,6 @@ body {
 }
 
 .folio-btn {
-    background-color: var(--bg-color);
     
     color: var(--accent);
     border: 1px solid var(--accent);
@@ -94,7 +92,6 @@ body {
 
 /* Inputs & Compact Sizes */
 .folio-title, .folio-author {
-    color: var(--text-color);
     width: 100%;
     border: none;
     background: transparent;
@@ -330,7 +327,6 @@ body {
     }
     /* Match desktop pill identically, just add shadow */
     .folio-actions .folio-btn {
-    background-color: var(--bg-color);
 
     }
     .folio-actions .folio-btn:active {
@@ -362,3 +358,4 @@ body {
         transform: translateY(0) scale(1);
     }
 }
+
