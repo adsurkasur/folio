@@ -63,6 +63,17 @@ body {
 }
 .folio-inputs {
     flex-grow: 1;
+    padding-right: var(--space-3);
+}
+.folio-actions {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+    flex-shrink: 0;
+    position: relative;
+}
+.folio-input-group {
+    position: relative;
 }
 
 /* Standard Buttons */
@@ -302,15 +313,6 @@ body {
     transform: scale(1.1);
 }
 
-/* Author Floating Bar (Action Buttons) */
-.author-floating-bar {
-    position: fixed;
-    bottom: var(--space-5); /* 32px */
-    right: var(--space-4); /* 24px */
-    display: flex;
-    gap: var(--space-3); /* 16px */
-    z-index: 1000;
-}
 .folio-btn-danger {
     color: #ff4d4d !important;
     border-color: #ff4d4d !important;
