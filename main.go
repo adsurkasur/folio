@@ -158,6 +158,7 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	tmpl.ExecuteTemplate(w, "editor.html", nil)
 }
 
@@ -202,6 +203,7 @@ func handleArticle(w http.ResponseWriter, r *http.Request) {
 		BaseURL string
 	}{a, canEdit, baseURL}
 
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	tmpl.ExecuteTemplate(w, "article.html", data)
 }
 
@@ -227,6 +229,7 @@ func handleEditPage(w http.ResponseWriter, r *http.Request) {
 		IsEdit  bool
 		Article Article
 	}{true, a}
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	tmpl.ExecuteTemplate(w, "editor.html", data)
 }
 
