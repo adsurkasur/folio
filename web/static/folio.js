@@ -114,7 +114,11 @@ function updateToolbarPosition() {
 function hideFormatBubble() {
     if (formatBubble) {
         formatBubble.classList.remove('active');
-        resetBubbleLink();
+        setTimeout(() => {
+            if (!formatBubble.classList.contains('active')) {
+                resetBubbleLink();
+            }
+        }, 200);
     }
 }
 
@@ -134,6 +138,10 @@ function updateFormatBubble() {
     if (canvasEl.contentEditable !== 'true') {
         hideFormatBubble();
         return;
+    }
+    
+    if (formatBubble.contains(document.activeElement)) {
+        return; // Don't hide if typing in the link input
     }
     // If currently typing a link inside the bubble, don't close
     const linkBox = formatBubble.querySelector('.folio-bubble-link-box');
