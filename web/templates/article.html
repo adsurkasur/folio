@@ -1,49 +1,47 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{.Article.Title}} - Folio</title>
-    
-    <!-- Open Graph Universal -->
-    <meta property="og:type" content="article">
+    <title>{{.Title}} - Folio</title>
+    <meta property="og:title" content="{{.Title}}">
     <meta property="og:site_name" content="Folio">
-    <meta property="og:title" content="{{.Article.Title}}">
-    <meta property="og:description" content="{{.Article.ContentText}}">
-    <meta property="og:url" content="{{.BaseURL}}/{{.Article.Slug}}">
-    
-    {{if .Article.OGImageURL}}
-    <meta property="og:image" content="{{.BaseURL}}{{.Article.OGImageURL}}">
+    <meta property="og:description" content="By {{.Author}}">
+    <meta property="og:type" content="article">
+    {{if .Thumbnail}}
+    <meta property="og:image" content="{{.Thumbnail}}">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="{{.BaseURL}}{{.Article.OGImageURL}}">
+    <meta name="twitter:image" content="{{.Thumbnail}}">
     {{end}}
-
-    <link rel="stylesheet" href="/static/folio.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✍️</text></svg>">
+    <link rel="stylesheet" href="/static/folio.css?v=3">
 </head>
 <body>
     <div class="folio-container">
+        {{if .CanEdit}}
         <header class="folio-header">
-            <a href="/" class="folio-logo">Folio</a>
-            <div>
-                {{if .CanEdit}}
-                <a href="/{{.Article.Slug}}/edit" class="folio-btn">Edit</a>
-                <button id="deleteBtn" class="folio-btn danger" data-slug="{{.Article.Slug}}">Delete</button>
-                {{end}}
-            </div>
+            <a href="/edit/{{.Slug}}" class="folio-btn" style="margin-right: 10px; text-decoration: none;">EDIT</a>
+            <button onclick="deleteArticle('{{.Slug}}')" class="folio-btn" style="color: #ff4444; border-color: #ff4444;">DELETE</button>
         </header>
+        {{end}}
 
         <main>
-            <h1 class="folio-title" style="margin-bottom: 5px;">{{.Article.Title}}</h1>
-            <div class="folio-meta">
-                <span>{{if .Article.AuthorName}}{{.Article.AuthorName}}{{else}}Anonymous{{end}} • {{.Article.CreatedAt.Format "Jan 02, 2006"}}</span>
-                <span>👁 {{.Article.ViewsCount}}</span>
+            <h1 class="folio-title" style="margin-bottom: 0;">{{.Title}}</h1>
+            <div class="folio-author" style="margin-bottom: 30px;">
+                {{.Author}} &middot; <span>{{.Views}} views</span> &middot; <span>{{.Date}}</span>
             </div>
             
-            <article class="folio-canvas">
-                {{.Article.ContentHTML}}
-            </article>
+            <div class="folio-canvas">
+                {{.ContentHTML}}
+            </div>
         </main>
     </div>
-    <script src="/static/folio.js"></script>
+    <script>
+        async function deleteArticle(slug) {
+            if(!confirm('Delete this article forever?')) return;
+            const res = await fetch('/api/articles/' + slug, { method: 'DELETE' });
+            if(res.ok) window.location.href = '/';
+        }
+    </script>
 </body>
 </html>

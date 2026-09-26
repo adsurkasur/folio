@@ -183,3 +183,8 @@ body {
         display: none !important;
     }
 }
+
+/* Embed Placeholder */
+.embed-placeholder::before { content: attr(data-placeholder); color: var(--text-muted); font-style: italic; font-family: var(--ui-font); pointer-events: none; position: absolute; }
+.folio-canvas.empty::before { content: attr(data-placeholder); color: var(--text-muted); pointer-events: none; position: absolute; }
+
