@@ -154,6 +154,7 @@ function updateFormatBubble() {
         hideFormatBubble();
         return;
     }
+    
     const range = sel.getRangeAt(0);
     if (!canvasEl.contains(range.commonAncestorContainer)) {
         hideFormatBubble();
@@ -164,11 +165,7 @@ function updateFormatBubble() {
         hideFormatBubble();
         return;
     }
-    const range = sel.getRangeAt(0);
-    if (!canvasEl.contains(range.commonAncestorContainer)) {
-        hideFormatBubble();
-        return;
-    }
+    
 
     const rect = range.getBoundingClientRect();
     let top = rect.top - 48 + window.scrollY;
