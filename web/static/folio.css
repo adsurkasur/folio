@@ -62,7 +62,8 @@ body {
     margin-bottom: var(--space-4); /* 24px */
 }
 .folio-inputs {
-    flex-grow: 1;
+    flex: 1 1 0;
+    min-width: 0;
     padding-right: var(--space-3);
 }
 .folio-actions {
@@ -107,6 +108,7 @@ body {
     margin-top: 0;
     color: var(--text-color);
     width: 100%;
+    min-width: 0;
     border: none;
     background: transparent;
     outline: none;
@@ -119,6 +121,9 @@ body {
     font-family: var(--content-font);
     padding: 0;
     margin-bottom: var(--space-2); /* 8px */
+    overflow-wrap: break-word;
+    word-break: break-word;
+    line-height: 1.25;
 }
 
 .folio-author {
