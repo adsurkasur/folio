@@ -14,19 +14,39 @@
 
 <br>
 
-Folio strips publishing down to its absolute essentials: **Title**, **Author**, and **Story**. It requires no accounts, no separate database servers to install, and no complex configurations. Compiled into a single Go binary, it is fast, portable, and ready to publish.
+Folio strips publishing down to its absolute essentials: **Title**, **Author**, and **Story**. It requires no accounts, no separate database servers to install, and no complex configurations. 
+
+Compiled into a **single, portable Go binary**, it is fast, standalone, and ready to publish in one click.
 
 ## Key Features
 
 - **No Accounts Required**: Instant anonymous publishing. Ownership and edit rights are managed via secure browser cookies and secret backup tokens.
-- **Pure Keyboard Markdown**: Fast inline formatting for headings (`#`, `##`, `###`), quotes (`>`), dividers (`---`), bullet and numbered lists, inline code (\`code\`), and code blocks (\`\`\`).
+- **Pure Keyboard Markdown**: Fast inline formatting for headings (`#`, `##`, `###`), quotes (`>`), dividers (`---`), bullet and numbered lists, inline code (`code`), and code blocks (```).
 - **Media & Embeds**: Upload local images or embed links directly into the canvas.
 - **Automated Social Previews**: Server automatically resizes and compresses the lead image to guarantee Open Graph preview compatibility (< 300KB) across messaging apps (WhatsApp, Telegram, Discord, X/Twitter).
-- **Single Standalone Binary**: Built entirely in Go with pure-Go SQLite (`modernc.org/sqlite`) in WAL mode. Templates and static assets are fully embedded (`//go:embed`). No external web server required.
+- **Single Portable Binary**: Built entirely in Go with pure-Go SQLite (`modernc.org/sqlite`). Templates and static HTML/CSS/JS assets are fully embedded (`//go:embed`). No external web server or database setup required.
 - **Spam Control & Storage Cleanup**: Built-in IP rate limiting and an automated background worker that purges unreferenced draft media.
 - **Local Draft Recovery**: Work in progress is automatically preserved in the browser's local storage to prevent accidental data loss.
 
-## Quickstart
+---
+
+## 🚀 Quickstart: Download & Run (No Installation Required)
+
+Because Folio is compiled into a single binary, you **do not** need to install Go, Apache, PHP, or MySQL. 
+
+1. Go to the [Releases page](../../releases/latest) and download the file for your operating system (Windows `.exe`, Linux, or macOS).
+2. Place the file in an empty folder on your computer or server.
+3. **Double-click** the file (or run it via terminal).
+4. Open your browser and go to `http://localhost:8085`.
+
+**Where does the data go?**
+Folio is 100% portable. When run, it will automatically create a `folio.db` (database file) and an `uploads/` folder in the **exact same directory** as the binary. All your articles and uploaded images are saved locally right there. To backup or move your entire web app, just copy the folder!
+
+---
+
+## 🛠️ Build from Source
+
+If you prefer to compile Folio yourself or want to modify the code:
 
 ### Prerequisites
 - Go 1.22 or higher
@@ -43,8 +63,6 @@ go build -o folio main.go
 # Run
 ./folio -port 8085
 ```
-
-Open `http://localhost:8085` in your browser.
 
 ## License
 
