@@ -14,53 +14,53 @@
 
 <br>
 
-Folio strips publishing down to its absolute essentials: **Title**, **Author**, and **Story**. It requires no accounts, no separate database servers to install, and no complex configurations. 
+Folio distills web publishing to its core essentials: **Title**, **Author**, and **Story**. Designed for simplicity, it eliminates the need for user accounts, external database servers, and complex configuration. 
 
-Compiled into a **single, portable Go binary**, it is fast, standalone, and ready to publish in one click.
+Delivered as a single, portable Go binary, Folio is lightweight, standalone, and ready to run immediately.
 
 ## Key Features
 
-- **No Accounts Required**: Instant anonymous publishing. Ownership and edit rights are managed via secure browser cookies and secret backup tokens.
+- **No Accounts Required**: Instant anonymous publishing. Ownership and editing rights are securely managed via browser cookies and backup tokens.
 - **Pure Keyboard Markdown**: Fast inline formatting for headings (`#`, `##`, `###`), quotes (`>`), dividers (`---`), bullet and numbered lists, inline code (`code`), and code blocks (```).
-- **Media & Embeds**: Upload local images or embed links directly into the canvas.
-- **Automated Social Previews**: Server automatically resizes and compresses the lead image to guarantee Open Graph preview compatibility (< 300KB) across messaging apps (WhatsApp, Telegram, Discord, X/Twitter).
-- **Single Portable Binary**: Built entirely in Go with pure-Go SQLite (`modernc.org/sqlite`). Templates and static HTML/CSS/JS assets are fully embedded (`//go:embed`). No external web server or database setup required.
+- **Media & Embeds**: Upload local images or embed external links directly into the canvas.
+- **Automated Social Previews**: The server automatically resizes and compresses lead images to ensure Open Graph preview compatibility (< 300KB) across messaging platforms (WhatsApp, Telegram, Discord, X).
+- **Single Portable Binary**: Built entirely in Go with a pure-Go SQLite driver (`modernc.org/sqlite`). Templates and static HTML/CSS/JS assets are fully embedded (`//go:embed`). No external web server or database setup is required.
 - **Spam Control & Storage Cleanup**: Built-in IP rate limiting and an automated background worker that purges unreferenced draft media.
 - **Local Draft Recovery**: Work in progress is automatically preserved in the browser's local storage to prevent accidental data loss.
 
 ---
 
-## 🚀 Quickstart: Download & Run (No Installation Required)
+## Quickstart: Download & Run
 
-Because Folio is compiled into a single binary, you **do not** need to install Go, Apache, PHP, or MySQL. 
+Folio is distributed as a single executable. There is no need to install runtime dependencies such as Go, PHP, Apache, or MySQL.
 
-1. Go to the [Releases page](../../releases/latest) and download the file for your operating system (Windows `.exe`, Linux, or macOS).
-2. Place the file in an empty folder on your computer or server.
-3. **Double-click** the file (or run it via terminal).
-4. Open your browser and go to `http://localhost:8085`.
+1. Navigate to the [Releases page](../../releases/latest) and download the appropriate file for your operating system (Windows `.exe`, Linux, or macOS).
+2. Place the executable in an empty directory on your computer or server.
+3. Run the executable (double-click on Windows, or execute via terminal).
+4. Open your web browser and navigate to `http://localhost:8085`.
 
-**Where does the data go?**
-Folio is 100% portable. When run, it will automatically create a `folio.db` (database file) and an `uploads/` folder in the **exact same directory** as the binary. All your articles and uploaded images are saved locally right there. To backup or move your entire web app, just copy the folder!
+**Data Storage**
+Folio is designed to be fully portable. Upon execution, it automatically generates a SQLite database (`folio.db`) and an `uploads/` directory in the exact same location as the binary. All articles and uploaded media are stored locally within this directory. To back up or migrate your installation, simply copy the entire directory.
 
 ---
 
-## 🛠️ Build from Source
+## Build from Source
 
-If you prefer to compile Folio yourself or want to modify the code:
+If you prefer to compile Folio yourself or wish to modify the source code, you can build it locally.
 
 ### Prerequisites
 - Go 1.22 or higher
 
-### Build & Run
+### Build Instructions
 ```bash
 # Clone the repository
 git clone https://github.com/adsurkasur/folio.git
 cd folio
 
-# Build binary
+# Build the binary
 go build -o folio main.go
 
-# Run
+# Run the server
 ./folio -port 8085
 ```
 
